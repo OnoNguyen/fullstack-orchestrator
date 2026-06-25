@@ -1,0 +1,26 @@
+# {project_name} Orchestration Agent Rules
+
+This file is the root navigator for project orchestration. Keep it small. Read
+only the deeper docs triggered by the current task.
+
+## Trigger Router
+
+| Trigger | Read |
+| --- | --- |
+| repo map, aliases, ownership, multi-repo work | `ORCHESTRATION.md` |
+| domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
+| slice planning, gates, dependencies, merge order | `SLICES.md` |
+| QA, qa, runtime evidence, browser/device/simulator checks | `QA.md` |
+| debug, dbg, runtime attach loops | `DEBUG.md` |
+| deploy, dpl, release, push, production verification | `DEPLOY.md` |
+| current pending state, blockers, landing, deploy state | `STATUS.md` |
+| documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
+| editing an implementation repo | that repo's local instructions |
+
+## Default Discipline
+
+- Resolve live repo locations and instructions before mutating files.
+- Read only the smallest triggered doc set needed for the task.
+- Treat generated docs as routing hints until verified against live git,
+  filesystem, test, CI, and deploy state.
+- Do not update `STATUS.md` unless acting as coordinator for current state.

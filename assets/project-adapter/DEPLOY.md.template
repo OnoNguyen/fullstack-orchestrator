@@ -1,0 +1,21 @@
+# {project_name} Deploy Runbook
+
+Deployment requires an explicit deploy trigger.
+
+## Workflow
+
+1. Identify payload repos and commits.
+2. Inspect dirty state, local main, remote main, and ahead/behind state.
+3. Exclude unrelated work unless explicitly included.
+4. Run required verification gates.
+5. Commit intended changes.
+6. Push only payload repos.
+7. Deploy only payload repos.
+8. Verify live state.
+9. Update `STATUS.md` with final success, final blocker, or next action.
+
+## Retry Policy
+
+Retry only when the failing command, error output, and fix are clear. Stop for
+auth failures, missing permissions, platform outages, destructive git
+operations, or unclear product behavior.

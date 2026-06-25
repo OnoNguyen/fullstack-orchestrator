@@ -1,0 +1,18 @@
+# {project_name} Slices
+
+Vertical slices are useful cuts through project behavior. Define slices by
+intent first, then implementation surfaces.
+
+## Slices To Confirm
+
+Use this shape for each approved slice:
+
+## Example Slice
+
+- Intent:
+- Implementation surfaces:
+- Depends on:
+- Domain terms:
+- Data/privacy/security boundary:
+- Verification:
+- Merge status/order:

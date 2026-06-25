@@ -1,0 +1,27 @@
+# {project_name} Orchestration
+
+This file contains the approved project topology for orchestration.
+
+## Repositories
+
+| Alias | Role | Local path | Remote | Default branch | Owner | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+{repo_rows}
+
+## Branch And Worktree Policy
+
+- Canonical local branches are pickup points unless this project says otherwise.
+- Use task branches or task worktrees for mutable work when a task may span
+  repos, run codegen, change deploy inputs, or need runtime QA.
+- Preserve unrelated dirty files and user changes.
+
+## Landing Policy
+
+- For single-repo work, land after that repo passes its documented gates.
+- For cross-repo work, use all-or-hold landing unless a slice explicitly says
+  otherwise.
+
+## Deploy Authority
+
+- Deployment requires an explicit deploy trigger from the user or this project's
+  `DEPLOY.md`.

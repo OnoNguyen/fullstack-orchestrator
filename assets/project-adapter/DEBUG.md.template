@@ -1,0 +1,14 @@
+# {project_name} Debug Runbook
+
+Use this file for project-specific debug and runtime attach loops.
+
+## Rules
+
+- Prefer the current task checkout or worktree over canonical main.
+- Avoid interrupting unrelated active dev servers, browsers, devices, or
+  simulators.
+- Report how the runtime was started and how attach success was proven.
+
+## Commands
+
+Add approved debug commands here after review.

@@ -1,0 +1,285 @@
+{
+  "version": 1,
+  "policy": "Recommendations only. Print install commands only when install_command is present or supplied by an override manifest.",
+  "skills": [
+    {
+      "name": "git-workflow-and-versioning",
+      "category": "core",
+      "priority": "high",
+      "when": "Any project with git, branches, commits, landing, rebasing, or release work.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Core workflow discipline for orchestrated work."
+    },
+    {
+      "name": "context-engineering",
+      "category": "core",
+      "priority": "high",
+      "when": "Project onboarding, adapter docs, root navigators, or context-window hygiene.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Useful with AGENTS.md and lazy-loaded docs."
+    },
+    {
+      "name": "planning-and-task-breakdown",
+      "category": "core",
+      "priority": "high",
+      "when": "A feature needs ordered implementation tasks, estimates, or parallelization.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Pairs with SLICES.md."
+    },
+    {
+      "name": "documentation-and-adrs",
+      "category": "core",
+      "priority": "high",
+      "when": "Architectural decisions, public APIs, shipping features, or durable project docs are involved.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Pairs with DOCUMENTATION_POLICY.md."
+    },
+    {
+      "name": "code-review-and-quality",
+      "category": "core",
+      "priority": "high",
+      "when": "Before merging or landing non-trivial changes.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Good final gate before all-or-hold landing."
+    },
+    {
+      "name": "test-driven-development",
+      "category": "core",
+      "priority": "high",
+      "when": "Implementing behavior, fixing bugs, or proving changes with regression tests.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use where behavior can be specified with tests."
+    },
+    {
+      "name": "frontend-ui-engineering",
+      "category": "frontend",
+      "priority": "high",
+      "when": "Frontend, mobile UI, layout, components, interactions, copy, or production-quality product surfaces.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use for visible UI work."
+    },
+    {
+      "name": "browser-testing-with-devtools",
+      "category": "frontend",
+      "priority": "medium",
+      "when": "Browser runtime QA, DOM inspection, console/network debugging, visual checks, or performance traces.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Requires a compatible browser/devtools connector."
+    },
+    {
+      "name": "performance-optimization",
+      "category": "frontend",
+      "priority": "medium",
+      "when": "Load time, Core Web Vitals, expensive renders, backend latency, or resource use matters.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Useful after a measurable performance target exists."
+    },
+    {
+      "name": "prototype",
+      "category": "frontend",
+      "priority": "medium",
+      "when": "A design, state machine, or interaction needs to be tried before committing.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Good for exploratory UI choices."
+    },
+    {
+      "name": "vocabulary",
+      "category": "frontend",
+      "priority": "low",
+      "when": "Precise UI, design, accessibility, or copy terminology would improve specs and reviews.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Complements GLOSSARY.md without replacing domain terms."
+    },
+    {
+      "name": "api-and-interface-design",
+      "category": "backend",
+      "priority": "high",
+      "when": "REST, GraphQL, public module boundaries, schemas, contracts, SDKs, or frontend/backend interfaces change.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use before locking API shapes."
+    },
+    {
+      "name": "security-and-hardening",
+      "category": "backend",
+      "priority": "high",
+      "when": "Auth, sessions, external integrations, file uploads, secrets, user input, or data boundaries are involved.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Pairs with glossary privacy/security boundaries."
+    },
+    {
+      "name": "source-driven-development",
+      "category": "backend",
+      "priority": "medium",
+      "when": "Framework/library behavior must be checked against official docs.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Useful when technology choices may have drifted."
+    },
+    {
+      "name": "debugging-and-error-recovery",
+      "category": "backend",
+      "priority": "medium",
+      "when": "Tests, builds, runtime behavior, or deploys fail unexpectedly.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use for root-cause debugging."
+    },
+    {
+      "name": "diagnose",
+      "category": "backend",
+      "priority": "medium",
+      "when": "A hard bug or performance regression needs reproduce, minimize, instrument, fix, and regression-test.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Stronger loop for difficult failures."
+    },
+    {
+      "name": "ci-cd-and-automation",
+      "category": "delivery",
+      "priority": "high",
+      "when": "CI, checks, deployment pipelines, release automation, or quality gates change.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Pairs with DEPLOY.md and QA.md."
+    },
+    {
+      "name": "shipping-and-launch",
+      "category": "delivery",
+      "priority": "medium",
+      "when": "Preparing a production launch, rollout, rollback, monitoring, or release checklist.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use for launch readiness."
+    },
+    {
+      "name": "github",
+      "category": "delivery",
+      "priority": "medium",
+      "when": "GitHub PRs, issues, stacked branches, repository automation, or gh CLI workflows are involved.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Useful when the project uses GitHub."
+    },
+    {
+      "name": "incremental-implementation",
+      "category": "delivery",
+      "priority": "medium",
+      "when": "A feature touches multiple files or needs staged landing.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Good companion for vertical slices."
+    },
+    {
+      "name": "spec-driven-development",
+      "category": "planning",
+      "priority": "medium",
+      "when": "A feature or project lacks a clear specification.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use before implementation when requirements are fuzzy."
+    },
+    {
+      "name": "idea-refine",
+      "category": "planning",
+      "priority": "medium",
+      "when": "An idea needs expansion, critique, or convergence before becoming a slice.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use before SLICES.md hardens a fuzzy concept."
+    },
+    {
+      "name": "interview-me",
+      "category": "planning",
+      "priority": "medium",
+      "when": "User intent is underspecified and product success criteria are unclear.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use for intent discovery."
+    },
+    {
+      "name": "grill-with-docs",
+      "category": "planning",
+      "priority": "medium",
+      "when": "A plan needs stress-testing against domain language and docs.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Useful before accepting glossary or slice decisions."
+    },
+    {
+      "name": "doubt-driven-development",
+      "category": "planning",
+      "priority": "low",
+      "when": "A non-trivial decision deserves adversarial review before standing.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use for high-stakes or hard-to-reverse choices."
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "category": "planning",
+      "priority": "low",
+      "when": "The project needs architectural cleanup, consolidation, or better AI navigability.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use after glossary and repo topology are known."
+    },
+    {
+      "name": "triage",
+      "category": "handoff",
+      "priority": "medium",
+      "when": "Incoming bugs, feature requests, or issue queues need classification.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Useful for support or issue intake."
+    },
+    {
+      "name": "to-prd",
+      "category": "handoff",
+      "priority": "low",
+      "when": "Conversation context should become a product requirements document.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use after product intent stabilizes."
+    },
+    {
+      "name": "to-issues",
+      "category": "handoff",
+      "priority": "low",
+      "when": "A plan or PRD should become independently grabbable implementation issues.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Use after slices and gates are reviewed."
+    },
+    {
+      "name": "handoff",
+      "category": "handoff",
+      "priority": "high",
+      "when": "Work crosses a thread, owner, review, QA, deploy, or context boundary.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Recommend when state must be preserved for another agent or later session."
+    },
+    {
+      "name": "find-skills",
+      "category": "handoff",
+      "priority": "low",
+      "when": "A user wants to discover whether a skill exists for a capability.",
+      "install_source": null,
+      "install_command": null,
+      "notes": "Useful for expanding a team's skill catalog."
+    }
+  ]
+}

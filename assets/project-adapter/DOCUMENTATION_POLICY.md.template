@@ -1,0 +1,17 @@
+# {project_name} Documentation Policy
+
+## Canonical Ownership
+
+- Repo topology lives in `ORCHESTRATION.md`.
+- Domain language lives in `GLOSSARY.md`.
+- Slice mapping and gates live in `SLICES.md`.
+- QA, debug, and deploy runbooks live in their matching docs.
+- Current state lives in `STATUS.md`.
+- Implementation specs, schemas, migrations, and code-level details live in the
+  relevant implementation repo.
+
+## Boundaries
+
+- Do not duplicate canonical glossary terms in repo-local context files.
+- Do not turn `STATUS.md` into a history log or scratchpad.
+- Do not store credentials in orchestration docs.
