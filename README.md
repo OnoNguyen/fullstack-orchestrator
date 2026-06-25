@@ -33,13 +33,13 @@ chosen coordinator repo:
 By default, discovery prints a compact audit report and writes nothing:
 
 ```bash
-python3 scripts/bootstrap_project_adapter.py /path/to/app /path/to/api
+python3 fullstack-orchestrator/scripts/bootstrap_project_adapter.py /path/to/app /path/to/api
 ```
 
 After reviewing the findings, write adapter docs:
 
 ```bash
-python3 scripts/bootstrap_project_adapter.py /path/to/app /path/to/api \
+python3 fullstack-orchestrator/scripts/bootstrap_project_adapter.py /path/to/app /path/to/api \
   --coordinator /path/to/orchestration \
   --project-name "My Project" \
   --write
@@ -48,13 +48,13 @@ python3 scripts/bootstrap_project_adapter.py /path/to/app /path/to/api \
 Validate the adapter:
 
 ```bash
-python3 scripts/validate_project_adapter.py /path/to/orchestration
+python3 fullstack-orchestrator/scripts/validate_project_adapter.py /path/to/orchestration
 ```
 
 Recommend companion skills:
 
 ```bash
-python3 scripts/recommend_skills.py --project /path/to/orchestration /path/to/app /path/to/api
+python3 fullstack-orchestrator/scripts/recommend_skills.py --project /path/to/orchestration /path/to/app /path/to/api
 ```
 
 ## Safety Model
