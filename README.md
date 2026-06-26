@@ -2,12 +2,13 @@
 
 [![skills.sh](https://skills.sh/b/OnoNguyen/fullstack-orchestrator)](https://skills.sh/OnoNguyen/fullstack-orchestrator)
 
-An Agent Skill for audited full-stack project orchestration across one repo, a
+An Agent Skill for reviewed full-stack project orchestration across one repo, a
 monorepo, or multiple repositories.
 
-The skill bootstraps a small project adapter, keeps `AGENTS.md` as a lazy root
-navigator, records approved repo topology and domain language, proposes vertical
-slices from evidence, and coordinates QA, debug, deploy, landing, and handoff.
+The skill runs a project scan, bootstraps a small project adapter, keeps
+`AGENTS.md` as a lazy root navigator, records approved repo topology and domain
+language, proposes vertical slices from evidence, and coordinates QA, debug,
+deploy, landing, and handoff.
 
 ## Install
 
@@ -17,7 +18,7 @@ npx skills add OnoNguyen/fullstack-orchestrator
 
 ## What It Creates
 
-After an audit and user review, the skill can write a project adapter into a
+After a project scan and user review, the skill can write a project adapter into a
 chosen coordinator repo:
 
 - `AGENTS.md`: short root navigator and trigger router
@@ -28,9 +29,9 @@ chosen coordinator repo:
 - `DOCUMENTATION_POLICY.md`: doc ownership
 - `STATUS.md`: current state
 
-## Audit First
+## Project Scan First
 
-By default, discovery prints a compact audit report and writes nothing:
+By default, discovery prints compact project scan findings and writes nothing:
 
 ```bash
 python3 fullstack-orchestrator/scripts/bootstrap_project_adapter.py /path/to/app /path/to/api
@@ -61,7 +62,7 @@ python3 fullstack-orchestrator/scripts/recommend_skills.py --project /path/to/or
 
 - Scans only user-provided local paths or URLs.
 - Does not clone/fetch remote URLs unless explicitly run with clone approval.
-- Keeps unreviewed findings in chat/audit output, not canonical docs.
+- Keeps unreviewed findings in chat/project scan output, not canonical docs.
 - Treats generated docs as routing hints until verified against live repo state.
 - Deploy remains explicit only.
 

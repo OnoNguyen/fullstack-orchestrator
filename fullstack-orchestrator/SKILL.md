@@ -1,6 +1,6 @@
 ---
 name: fullstack-orchestrator
-description: Coordinates audited full-stack project work across one repo, a monorepo, or multiple repositories by discovering project topology, routing through lazy orchestration docs, and managing slices, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices, coordinating frontend/backend/infra work, setting up AGENTS.md routing, or deciding which companion skills to recommend.
+description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices, coordinating frontend/backend/infra work, setting up AGENTS.md routing, or deciding which companion skills to recommend.
 ---
 
 # Fullstack Orchestrator
@@ -13,8 +13,8 @@ smallest project docs needed for the current trigger.
 
 ## First Moves
 
-- If no project adapter exists, run an audit-only onboarding pass. See
-  [onboarding-audit.md](references/onboarding-audit.md).
+- If no project adapter exists, run a review-only project scan. See
+  [project-scan.md](references/project-scan.md).
 - If `AGENTS.md` exists, read it first as the root navigator, then load only the
   deeper docs it routes to.
 - For multi-repo or monorepo work, resolve the live implementation surfaces
@@ -47,7 +47,7 @@ writing docs: repo map, glossary, slices, QA/debug/deploy.
 
 Use scripts as evidence collectors and validators, not as authority:
 
-- `scripts/bootstrap_project_adapter.py`: audit user-provided seeds and, after
+- `scripts/bootstrap_project_adapter.py`: scan user-provided seeds and, after
   approval, write adapter docs.
 - `scripts/validate_project_adapter.py`: check adapter docs for required
   structure and low-precontext routing.

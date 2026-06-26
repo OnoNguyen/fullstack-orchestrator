@@ -1,9 +1,9 @@
-# Onboarding Audit
+# Project Scan
 
 ## Goal
 
 Build a reviewed project adapter from evidence, not guesses. The default
-onboarding mode is audit-only: scan explicit seeds, present a compact report in
+onboarding mode is review-only: scan explicit seeds, present compact findings in
 chat, and write docs only after the user approves a section.
 
 ## Inputs
@@ -34,9 +34,9 @@ Collect signals from:
 Scripts may collect evidence. The agent synthesizes product slices and term
 boundaries.
 
-## Audit Report
+## Project Scan Findings
 
-Keep the report compact but auditable:
+Keep the findings compact but reviewable:
 
 - finding
 - confidence: high, medium, or low

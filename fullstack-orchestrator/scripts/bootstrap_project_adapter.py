@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit explicit project seeds and optionally write orchestration adapter docs."""
+"""Scan explicit project seeds and optionally write orchestration adapter docs."""
 
 from __future__ import annotations
 
@@ -246,11 +246,11 @@ def role_confidence(finding: RepoFinding) -> str:
     return "medium"
 
 
-def render_audit(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
+def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines: list[str] = []
-    lines.append("# Fullstack Orchestrator Onboarding Audit")
+    lines.append("# Fullstack Orchestrator Project Scan")
     lines.append("")
-    lines.append("Default mode is audit-only. Review these findings before writing adapter docs.")
+    lines.append("Default mode is review-only. Review these findings before writing adapter docs.")
     lines.append("")
     if skipped_urls:
         lines.append("## Remote Seeds Needing Approval")
@@ -289,7 +289,7 @@ def render_audit(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("Use the repo evidence above to ask the user which end-to-end capabilities matter.")
     lines.append("For each accepted slice, capture intent, surfaces, dependencies, terms, gates, and merge order.")
     lines.append("")
-    lines.append("## Approval Checklist")
+    lines.append("## Review Checklist")
     lines.append("")
     lines.append("- Repo map approved")
     lines.append("- Glossary terms approved")
@@ -370,7 +370,7 @@ def main() -> int:
     findings = list(repos.values())
     findings.sort(key=lambda item: item.alias)
 
-    print(render_audit(findings, skipped_urls))
+    print(render_scan(findings, skipped_urls))
 
     if args.write:
         project_name = args.project_name or Path(args.coordinator).resolve().name
