@@ -7,7 +7,7 @@ are installed. Print install commands only when a public source is verified or
 the project supplies an override manifest with an install source.
 
 Use the public catalog in `assets/companion-skills.json` as defaults. Teams may
-add their own manifest in the coordinator repo and pass it to
+add their own manifest in the orchestration repo and pass it to
 `scripts/recommend_skills.py --manifest`.
 
 ## Core Orchestration

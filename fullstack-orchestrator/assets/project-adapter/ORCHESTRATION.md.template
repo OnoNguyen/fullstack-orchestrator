@@ -1,6 +1,8 @@
 # {project_name} Orchestration
 
-This file contains the approved project topology for orchestration.
+This file contains the approved project topology for orchestration. This
+orchestration repo owns shared project routing; implementation repos are
+surfaces only.
 
 ## Repositories
 
@@ -10,10 +12,8 @@ This file contains the approved project topology for orchestration.
 
 ## Branch And Worktree Policy
 
-- Canonical local branches are pickup points unless this project says otherwise.
-- Use task branches or task worktrees for mutable work when a task may span
-  repos, run codegen, change deploy inputs, or need runtime QA.
-- Preserve unrelated dirty files and user changes.
+See `WORKTREES.md` for task checkout policy, canonical pickup branches,
+cross-repo landing, and cleanup.
 
 ## Landing Policy
 

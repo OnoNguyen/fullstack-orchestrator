@@ -8,6 +8,8 @@ only the deeper docs triggered by the current task.
 | Trigger | Read |
 | --- | --- |
 | repo map, aliases, ownership, multi-repo work | `ORCHESTRATION.md` |
+| tasks, tsk, task board, continue/abort candidates | `TASKS.md` |
+| task branches, worktrees, landing, cleanup | `WORKTREES.md` |
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
 | slice planning, gates, dependencies, merge order | `SLICES.md` |
 | QA, qa, runtime evidence, browser/device/simulator checks | `QA.md` |

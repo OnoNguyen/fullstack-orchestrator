@@ -4,8 +4,9 @@
 
 The adapter teaches this skill how a specific project is organized without
 loading every project rule into precontext. Keep shared orchestration docs in a
-chosen coordinator repo. Keep repo-specific implementation notes inside the
-implementation repos.
+dedicated orchestration repo, usually named `<project-slug>-orchestration`.
+Keep repo-specific implementation notes inside the implementation repos.
+Implementation repos are surfaces only by default.
 
 ## AGENTS.md
 
@@ -26,6 +27,8 @@ Recommended trigger rows:
 | Trigger | Read |
 | --- | --- |
 | repo map, aliases, ownership, multi-repo work | `ORCHESTRATION.md` |
+| tasks, tsk, task board, continue/abort candidates | `TASKS.md` |
+| task branches, worktrees, landing, cleanup | `WORKTREES.md` |
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
 | slice planning, gates, dependencies, merge order | `SLICES.md` |
 | QA, runtime evidence, browser/device/simulator checks | `QA.md` |
@@ -42,8 +45,35 @@ Record only approved repo topology:
 | Alias | Role | Local path | Remote | Default branch | Owner | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 
-Also include branch/worktree policy, landing authority, deploy authority, and
-cross-repo all-or-hold rules when they exist.
+Keep branch/worktree details in `WORKTREES.md`; `ORCHESTRATION.md` may link to
+that policy but should stay focused on topology.
+
+## WORKTREES.md
+
+Record approved mutation and landing policy:
+
+- canonical pickup branch per repo
+- task worktree root
+- task branch naming convention
+- when task worktrees are required
+- dirty-state preservation rules
+- runtime ownership rules
+- cross-repo all-or-hold policy
+- landing and cleanup rules
+
+## TASKS.md
+
+Record the approved `tasks`/`tsk` command behavior:
+
+- task-board sources such as `STATUS.md`, `SLICES.md`, `WORKTREES.md`, threads,
+  worktrees, and branch state
+- actionable-only inclusion rules
+- row status labels
+- board columns
+- ranking policy
+- action boundary for cleanup, aborts, thread archiving, and status updates
+
+`TASKS.md` is command policy, not a backlog. Do not store every task there.
 
 ## GLOSSARY.md
 
@@ -84,6 +114,7 @@ Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
 
 - glossary terms live in `GLOSSARY.md`
 - topology lives in `ORCHESTRATION.md`
+- task-board command policy lives in `TASKS.md`
 - slices and gates live in `SLICES.md`
 - QA/debug/deploy runbooks live in their matching docs
 - implementation specs, schemas, migrations, and code-level docs live in the

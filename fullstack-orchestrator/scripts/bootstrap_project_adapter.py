@@ -7,7 +7,6 @@ import argparse
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -31,6 +30,29 @@ SKIP_DIRS = {
     "target",
     "vendor",
 }
+ROLE_SUFFIXES = {
+    "android",
+    "api",
+    "app",
+    "backend",
+    "client",
+    "docs",
+    "frontend",
+    "infra",
+    "ios",
+    "job",
+    "jobs",
+    "mobile",
+    "orchestration",
+    "orchestrator",
+    "server",
+    "service",
+    "web",
+    "worker",
+    "workers",
+}
+GENERIC_PARENT_NAMES = {"code", "dev", "projects", "repos", "source", "src", "work", "workspace", "workspaces"}
+IMPLEMENTATION_MARKERS = {"package.json", "go.mod", "pyproject.toml", "Cargo.toml", "Dockerfile"}
 
 
 @dataclass
@@ -246,11 +268,104 @@ def role_confidence(finding: RepoFinding) -> str:
     return "medium"
 
 
+def split_name(value: str) -> list[str]:
+    return [part for part in re.split(r"[^a-z0-9]+", value.lower()) if part]
+
+
+def common_parent(findings: list[RepoFinding]) -> Path | None:
+    if not findings:
+        return None
+    parents = [finding.path.parent for finding in findings]
+    try:
+        return Path(os.path.commonpath([str(parent) for parent in parents]))
+    except ValueError:
+        return None
+
+
+def derive_project_slug(findings: list[RepoFinding], parent: Path | None) -> str:
+    if not findings:
+        return "project"
+    token_counts: dict[str, int] = {}
+    ordered_tokens: list[str] = []
+    for finding in findings:
+        seen: set[str] = set()
+        for token in split_name(finding.path.name):
+            if token in ROLE_SUFFIXES or token in seen:
+                continue
+            seen.add(token)
+            if token not in token_counts:
+                ordered_tokens.append(token)
+            token_counts[token] = token_counts.get(token, 0) + 1
+    shared = [token for token in ordered_tokens if token_counts.get(token, 0) > 1]
+    if shared:
+        return shared[0]
+    if len(findings) == 1:
+        tokens = [token for token in split_name(findings[0].path.name) if token not in ROLE_SUFFIXES]
+        if tokens:
+            return "-".join(tokens)
+    if parent and parent.name.lower() not in GENERIC_PARENT_NAMES:
+        return re.sub(r"[^a-z0-9]+", "-", parent.name.lower()).strip("-") or "project"
+    return "project"
+
+
+def suggested_orchestration_path(findings: list[RepoFinding]) -> Path:
+    parent = common_parent(findings)
+    slug = derive_project_slug(findings, parent)
+    base = parent or Path.cwd()
+    return base / f"{slug}-orchestration"
+
+
+def suggested_worktree_root(findings: list[RepoFinding]) -> Path:
+    parent = common_parent(findings)
+    slug = derive_project_slug(findings, parent)
+    base = parent or Path.cwd()
+    return base / "wt-tasks" / slug
+
+
+def is_dedicated_orchestration_repo(path: Path) -> bool:
+    name = path.name.lower()
+    if any(token in name for token in ("orchestration", "orchestrator", "coordination")):
+        return True
+    has_orchestration_docs = (path / "ORCHESTRATION.md").exists() and (path / "AGENTS.md").exists()
+    has_implementation_markers = any((path / marker).exists() for marker in IMPLEMENTATION_MARKERS)
+    if has_orchestration_docs and not has_implementation_markers:
+        return True
+    return False
+
+
+def scanned_repo_paths(findings: list[RepoFinding]) -> set[Path]:
+    return {finding.path.resolve() for finding in findings}
+
+
 def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
+    orchestration_path = suggested_orchestration_path(findings)
+    worktree_root = suggested_worktree_root(findings)
     lines: list[str] = []
     lines.append("# Fullstack Orchestrator Project Scan")
     lines.append("")
     lines.append("Default mode is review-only. Review these findings before writing adapter docs.")
+    lines.append("")
+    lines.append("## Recommended Orchestration Repo")
+    lines.append("")
+    lines.append(f"- Suggested path: {orchestration_path}")
+    lines.append("- Purpose: keep orchestration docs separate from implementation repos.")
+    lines.append("- Naming convention: `<project-slug>-orchestration`.")
+    lines.append("- Do not use an app, API, web, worker, or infra repo as the coordinator by default.")
+    lines.append("")
+    lines.append("## Recommended Worktree Policy")
+    lines.append("")
+    lines.append(f"- Suggested task worktree root: {worktree_root}")
+    lines.append("- Suggested task branch convention: `task/<short-slice>`.")
+    lines.append("- Treat canonical local branches as clean pickup points unless the project says otherwise.")
+    lines.append("- Use task worktrees for cross-repo work, codegen, deploy-input changes, and runtime QA.")
+    lines.append("- Default cross-repo landing: all-or-hold.")
+    lines.append("")
+    lines.append("## Recommended Task Board Policy")
+    lines.append("")
+    lines.append("- `tasks` or `tsk` should produce an actionable-only board.")
+    lines.append("- Suggested sources: STATUS.md, SLICES.md, WORKTREES.md, thread state when available, and live git/worktree state.")
+    lines.append("- Do not update STATUS.md, archive threads, delete worktrees, or delete branches while generating the board.")
+    lines.append("- Treat abort/cleanup rows as recommendation-only until the user confirms the specific action.")
     lines.append("")
     if skipped_urls:
         lines.append("## Remote Seeds Needing Approval")
@@ -291,11 +406,25 @@ def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("")
     lines.append("## Review Checklist")
     lines.append("")
+    lines.append("- Dedicated orchestration repo created or confirmed")
+    lines.append("- Task worktree root and landing policy approved")
+    lines.append("- `tasks`/`tsk` task-board policy approved")
     lines.append("- Repo map approved")
     lines.append("- Glossary terms approved")
     lines.append("- Vertical slices approved")
     lines.append("- QA/debug/deploy gates approved")
     lines.append("- Companion skill recommendations reviewed")
+    lines.append("")
+    lines.append("## Recommended Next Steps")
+    lines.append("")
+    lines.append("Option A — Create or confirm the dedicated orchestration repo")
+    lines.append(f"- Use `{orchestration_path}` unless you already have a dedicated orchestration/docs repo.")
+    lines.append("- Write AGENTS.md, ORCHESTRATION.md, TASKS.md, WORKTREES.md, GLOSSARY.md, SLICES.md, QA.md, DEBUG.md, DEPLOY.md, DOCUMENTATION_POLICY.md, and STATUS.md there.")
+    lines.append(f"- Approve `{worktree_root}` or pass `--worktree-root` with the chosen task worktree root.")
+    lines.append("- Keep scanned implementation repos as surfaces only.")
+    lines.append("")
+    lines.append("Option B — Review the proposed project map and slices")
+    lines.append("- Correct aliases, roles, missing repos, glossary terms, and slice boundaries before writing docs.")
     return "\n".join(lines)
 
 
@@ -317,12 +446,23 @@ def repo_rows(findings: list[RepoFinding]) -> str:
     return "\n".join(rows)
 
 
-def write_docs(coordinator: Path, project_name: str, findings: list[RepoFinding], force: bool) -> list[Path]:
+def write_docs(
+    coordinator: Path,
+    project_name: str,
+    findings: list[RepoFinding],
+    force: bool,
+    worktree_root: str,
+    task_branch_convention: str,
+    landing_policy: str,
+) -> list[Path]:
     coordinator.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
     values = {
         "project_name": project_name,
         "repo_rows": repo_rows(findings),
+        "worktree_root": worktree_root,
+        "task_branch_convention": task_branch_convention,
+        "landing_policy": landing_policy,
     }
     for template in sorted(TEMPLATE_DIR.glob("*.template")):
         target = coordinator / template.name.removesuffix(".template")
@@ -338,9 +478,21 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("seeds", nargs="*", help="Explicit local repo roots, monorepo roots, or Git URLs")
     parser.add_argument("--project-name", default="", help="Project name for generated docs")
-    parser.add_argument("--coordinator", default=".", help="Coordinator directory for --write")
+    parser.add_argument("--coordinator", default="", help="Dedicated orchestration repo/directory for --write")
+    parser.add_argument("--worktree-root", default="", help="Approved task worktree root for generated WORKTREES.md")
+    parser.add_argument(
+        "--task-branch-convention",
+        default="task/<short-slice>",
+        help="Approved task branch naming convention for generated WORKTREES.md",
+    )
+    parser.add_argument("--landing-policy", default="all-or-hold", help="Approved landing policy for generated WORKTREES.md")
     parser.add_argument("--write", action="store_true", help="Write adapter docs after user review")
     parser.add_argument("--force", action="store_true", help="Overwrite existing adapter docs")
+    parser.add_argument(
+        "--allow-implementation-coordinator",
+        action="store_true",
+        help="Allow writing into a scanned implementation repo; not recommended",
+    )
     parser.add_argument("--allow-clone", action="store_true", help="Allow cloning URL seeds")
     parser.add_argument("--clone-dir", default=".tmp/fullstack-orchestrator-clones", help="Clone destination for URL seeds")
     return parser.parse_args()
@@ -373,8 +525,32 @@ def main() -> int:
     print(render_scan(findings, skipped_urls))
 
     if args.write:
-        project_name = args.project_name or Path(args.coordinator).resolve().name
-        written = write_docs(Path(args.coordinator).expanduser().resolve(), project_name, findings, args.force)
+        if not args.coordinator:
+            suggested = suggested_orchestration_path(findings)
+            raise SystemExit(
+                "Writing requires --coordinator pointing at a dedicated orchestration repo/directory. "
+                f"Suggested path: {suggested}"
+            )
+        coordinator = Path(args.coordinator).expanduser().resolve()
+        if coordinator in scanned_repo_paths(findings) and not is_dedicated_orchestration_repo(coordinator):
+            raise SystemExit(
+                f"Refusing to write orchestration docs into scanned implementation repo: {coordinator}. "
+                "Create or choose a dedicated <project-slug>-orchestration repo instead, "
+                "or rerun with --allow-implementation-coordinator if you intentionally want this."
+            )
+        if coordinator in scanned_repo_paths(findings) and args.allow_implementation_coordinator:
+            print(f"Warning: writing into scanned implementation repo by explicit override: {coordinator}")
+        project_name = args.project_name or coordinator.name
+        worktree_root = args.worktree_root or str(suggested_worktree_root(findings))
+        written = write_docs(
+            coordinator,
+            project_name,
+            findings,
+            args.force,
+            worktree_root,
+            args.task_branch_convention,
+            args.landing_policy,
+        )
         print("")
         print("## Written Adapter Docs")
         for path in written:

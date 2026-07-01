@@ -1,0 +1,52 @@
+# {project_name} Worktrees And Landing
+
+This file defines how mutable implementation work is isolated and landed.
+
+## Canonical Pickup Points
+
+- Default canonical branch: the `Default branch` listed in `ORCHESTRATION.md`.
+- Canonical local branches are pickup points and should stay free of unrelated
+  uncommitted changes.
+- Verify live branch, dirty state, and ahead/behind state before editing.
+
+## Task Worktree Root
+
+- Approved root: `{worktree_root}`
+- Branch naming convention: `{task_branch_convention}` unless this project says
+  otherwise.
+- Use the same task branch name across affected repos when a slice spans repos.
+
+## When To Use A Task Worktree
+
+Use a task branch or task worktree when work may:
+
+- span more than one implementation repo
+- run codegen, migrations, or generated asset updates
+- change deploy inputs, release config, or environment-sensitive files
+- require browser, simulator, device, or long-running runtime QA
+- overlap with unrelated local dirty work
+
+## Start Checklist
+
+Before mutating an implementation repo:
+
+1. Read the orchestration root navigator and triggered docs.
+2. Read that repo's local instructions.
+3. Inspect branch, dirty state, and ahead/behind state.
+4. Create or reuse the task checkout/worktree required by this policy.
+5. Preserve unrelated dirty files and user changes.
+
+## Cross-Repo Landing
+
+- Default policy: `{landing_policy}`.
+- No affected repo lands until every affected repo rebases cleanly and passes its
+  documented gates.
+- Use `SLICES.md` for slice-specific merge order when it differs from this
+  default.
+
+## Cleanup
+
+- Remove merged task worktrees and stale task branches after successful landing
+  unless the user asks to preserve them.
+- Never discard unrelated work or delete an unmerged worktree without explicit
+  approval.

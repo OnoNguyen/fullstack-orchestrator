@@ -1,0 +1,58 @@
+# {project_name} Task Board
+
+Use this file when the user says `tasks` or `tsk`.
+
+## Purpose
+
+Produce an actionable-only board for current orchestration work. The board is an
+orientation surface, not a second issue tracker.
+
+## Sources
+
+Check the smallest live source set needed:
+
+- `STATUS.md` for current pending work and blockers
+- `SLICES.md` for approved slice names, surfaces, gates, and landing order
+- `WORKTREES.md` for task branch/worktree policy
+- `ORCHESTRATION.md` for repo aliases and local paths
+- active threads, task worktrees, branches, and dirty state when available
+
+If thread tools are available, inspect relevant project threads before ranking.
+If they are not available, rely on local worktrees, git state, and orchestration
+docs.
+
+## Board Rules
+
+- Include only actionable rows: ready work, blocked work, work needing QA, work
+  needing landing, or work that appears abandoned.
+- Omit completed history unless live residue still needs a decision.
+- Verify actual repo, branch/worktree, and git state before ranking a row.
+- Treat cleanup and abort candidates as recommendation-only.
+- Do not update `STATUS.md`, archive threads, delete worktrees, or delete
+  branches while generating the board.
+
+## Status Labels
+
+Use these statuses:
+
+- `Ready to continue`
+- `Needs QA`
+- `Needs landing`
+- `Blocked`
+- `Abort candidate`
+
+## Columns
+
+Use these columns:
+
+| Rank | Task | Status | Why prioritized | Repo/worktree | Next action | Open |
+| --- | --- | --- | --- | --- | --- | --- |
+
+Rank impact first: production or launch blockers, broken user-visible behavior,
+deploy risk, and active high-priority work outrank routine cleanup.
+
+## Action Boundary
+
+After presenting the board, ask which row to continue, land, QA, hand off, or
+abort. Do not take destructive cleanup action until the user confirms the
+specific row.

@@ -5,10 +5,10 @@
 An Agent Skill for reviewed full-stack project orchestration across one repo, a
 monorepo, or multiple repositories.
 
-The skill runs a project scan, bootstraps a small project adapter, keeps
-`AGENTS.md` as a lazy root navigator, records approved repo topology and domain
-language, proposes vertical slices from evidence, and coordinates QA, debug,
-deploy, landing, and handoff.
+The skill runs a project scan, bootstraps a small project adapter in a dedicated
+orchestration repo, keeps `AGENTS.md` as a lazy root navigator, records approved
+repo topology and domain language, proposes vertical slices from evidence, and
+coordinates task boards, QA, debug, deploy, landing, and handoff.
 
 ## Install
 
@@ -18,11 +18,13 @@ npx skills add OnoNguyen/fullstack-orchestrator
 
 ## What It Creates
 
-After a project scan and user review, the skill can write a project adapter into a
-chosen coordinator repo:
+After a project scan and user review, the skill can write a project adapter into
+a dedicated orchestration repo. Implementation repos stay as surfaces only:
 
 - `AGENTS.md`: short root navigator and trigger router
 - `ORCHESTRATION.md`: repo map, aliases, roles, ownership, branches
+- `TASKS.md`: `tasks`/`tsk` board policy and action boundaries
+- `WORKTREES.md`: task branches/worktrees, pickup points, landing, cleanup
 - `GLOSSARY.md`: canonical domain language
 - `SLICES.md`: vertical slices, surfaces, gates, merge order
 - `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks
@@ -40,8 +42,10 @@ python3 fullstack-orchestrator/scripts/bootstrap_project_adapter.py /path/to/app
 After reviewing the findings, write adapter docs:
 
 ```bash
+mkdir -p /path/to/my-project-orchestration
 python3 fullstack-orchestrator/scripts/bootstrap_project_adapter.py /path/to/app /path/to/api \
-  --coordinator /path/to/orchestration \
+  --coordinator /path/to/my-project-orchestration \
+  --worktree-root /path/to/wt-tasks/my-project \
   --project-name "My Project" \
   --write
 ```

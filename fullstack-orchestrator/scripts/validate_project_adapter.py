@@ -11,6 +11,8 @@ from pathlib import Path
 REQUIRED_FILES = {
     "AGENTS.md": ["Trigger Router", "Default Discipline"],
     "ORCHESTRATION.md": ["Repositories"],
+    "TASKS.md": ["Purpose", "Board Rules", "Status Labels"],
+    "WORKTREES.md": ["Canonical Pickup Points", "Cross-Repo Landing"],
     "GLOSSARY.md": [],
     "SLICES.md": [],
     "QA.md": [],

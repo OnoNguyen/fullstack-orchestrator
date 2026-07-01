@@ -12,7 +12,7 @@ Accept only explicit user-provided seeds:
 
 - local repo paths
 - local monorepo roots
-- local coordinator docs
+- local orchestration docs
 - GitHub URLs
 
 Do not scan sibling repos or GitHub orgs unless the user gives those exact
@@ -45,11 +45,14 @@ Keep the findings compact but reviewable:
 
 Report sections in this order:
 
-1. repo map
-2. glossary candidates and term conflicts
-3. vertical slice candidates
-4. QA/debug/deploy gates
-5. companion skill recommendations
+1. recommended orchestration repo
+2. recommended worktree policy
+3. task-board command policy
+4. repo map
+5. glossary candidates and term conflicts
+6. vertical slice candidates
+7. QA/debug/deploy gates
+8. companion skill recommendations
 
 ## Approval Rules
 
@@ -58,6 +61,11 @@ not be written to `ORCHESTRATION.md`, `GLOSSARY.md`, or `SLICES.md`.
 
 When writing docs after approval:
 
+- create or confirm a dedicated `<project-slug>-orchestration` repo first
+- keep implementation repos as surfaces only
+- approve task worktree root, branch naming, and landing policy
+- approve whether `tasks`/`tsk` should use thread tools, local git/worktrees, or
+  both when producing its task board
 - write only approved facts
 - keep `AGENTS.md` as a router
 - avoid `reviewed: false` markers in canonical docs

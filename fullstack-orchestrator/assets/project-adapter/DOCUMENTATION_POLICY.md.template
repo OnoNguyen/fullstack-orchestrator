@@ -3,6 +3,7 @@
 ## Canonical Ownership
 
 - Repo topology lives in `ORCHESTRATION.md`.
+- Task-board command policy lives in `TASKS.md`.
 - Domain language lives in `GLOSSARY.md`.
 - Slice mapping and gates live in `SLICES.md`.
 - QA, debug, and deploy runbooks live in their matching docs.
@@ -13,5 +14,6 @@
 ## Boundaries
 
 - Do not duplicate canonical glossary terms in repo-local context files.
+- Do not turn `TASKS.md` into an issue tracker or status log.
 - Do not turn `STATUS.md` into a history log or scratchpad.
 - Do not store credentials in orchestration docs.

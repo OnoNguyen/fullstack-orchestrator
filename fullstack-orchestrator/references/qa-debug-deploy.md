@@ -15,7 +15,8 @@ it. Do not treat a dev server being up as proof that the app or site works.
 ## Debug
 
 Debug requests may use dirty state only when the project adapter allows it and
-only inside the task checkout/worktree it owns.
+only inside the task checkout/worktree it owns. Read `WORKTREES.md` when task
+checkout ownership is unclear.
 
 Before starting local runtimes:
 
@@ -52,7 +53,8 @@ destructive git operations, or unclear product behavior.
 
 For cross-repo work, use all-or-hold landing when the adapter defines it. No repo
 lands until all affected surfaces pass gates and rebase cleanly. Preserve user
-changes and never discard unrelated dirty work without explicit approval.
+changes and never discard unrelated dirty work without explicit approval. Use
+`WORKTREES.md` for cleanup rules before deleting task worktrees or branches.
 
 ## Handoff
 
