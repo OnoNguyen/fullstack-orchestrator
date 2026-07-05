@@ -22,6 +22,10 @@ REQUIRED_FILES = {
     "STATUS.md": [],
 }
 
+OPTIONAL_FILES = {
+    "SKILL_FEEDBACK.md": ["Skill Improvement Candidates"],
+}
+
 FORBIDDEN_MARKERS = ["reviewed: false", "unreviewed finding", "unreviewed:"]
 
 
@@ -50,6 +54,21 @@ def validate(root: Path, strict: bool) -> tuple[list[str], list[str]]:
             if marker in lowered:
                 errors.append(f"{name} contains unreviewed marker: {marker}")
 
+    present_optional: list[str] = []
+    for name, headings in OPTIONAL_FILES.items():
+        path = root / name
+        if not path.exists():
+            continue
+        present_optional.append(name)
+        content = read(path)
+        for heading in headings:
+            if heading not in content:
+                warnings.append(f"{name} missing heading text: {heading}")
+        lowered = content.lower()
+        for marker in FORBIDDEN_MARKERS:
+            if marker in lowered:
+                errors.append(f"{name} contains unreviewed marker: {marker}")
+
     agents = root / "AGENTS.md"
     if agents.exists():
         lines = read(agents).splitlines()
@@ -59,6 +78,9 @@ def validate(root: Path, strict: bool) -> tuple[list[str], list[str]]:
         agents_text = read(agents)
         for doc in REQUIRED_FILES:
             if doc != "AGENTS.md" and doc not in agents_text:
+                warnings.append(f"AGENTS.md does not route to {doc}")
+        for doc in present_optional:
+            if doc not in agents_text:
                 warnings.append(f"AGENTS.md does not route to {doc}")
 
     orchestration = root / "ORCHESTRATION.md"

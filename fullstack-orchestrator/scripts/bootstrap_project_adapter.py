@@ -402,7 +402,7 @@ def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("## Vertical Slice Prompts")
     lines.append("")
     lines.append("Use the repo evidence above to ask the user which end-to-end capabilities matter.")
-    lines.append("For each accepted slice, capture intent, surfaces, dependencies, terms, gates, and merge order.")
+    lines.append("For each accepted slice, capture intent, surfaces, dependencies, terms, BDD scenarios, gates, and merge order.")
     lines.append("")
     lines.append("## Review Checklist")
     lines.append("")
@@ -411,7 +411,7 @@ def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("- `tasks`/`tsk` task-board policy approved")
     lines.append("- Repo map approved")
     lines.append("- Glossary terms approved")
-    lines.append("- Vertical slices approved")
+    lines.append("- Vertical slices approved with BDD scenarios and acceptance gates")
     lines.append("- QA/debug/deploy gates approved")
     lines.append("- Companion skill recommendations reviewed")
     lines.append("")
@@ -419,7 +419,7 @@ def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("")
     lines.append("Option A — Create or confirm the dedicated orchestration repo")
     lines.append(f"- Use `{orchestration_path}` unless you already have a dedicated orchestration/docs repo.")
-    lines.append("- Write AGENTS.md, ORCHESTRATION.md, TASKS.md, WORKTREES.md, GLOSSARY.md, SLICES.md, QA.md, DEBUG.md, DEPLOY.md, DOCUMENTATION_POLICY.md, and STATUS.md there.")
+    lines.append("- Write AGENTS.md, ORCHESTRATION.md, TASKS.md, WORKTREES.md, GLOSSARY.md, SLICES.md, QA.md, DEBUG.md, DEPLOY.md, DOCUMENTATION_POLICY.md, STATUS.md, and SKILL_FEEDBACK.md there.")
     lines.append(f"- Approve `{worktree_root}` or pass `--worktree-root` with the chosen task worktree root.")
     lines.append("- Keep scanned implementation repos as surfaces only.")
     lines.append("")
@@ -464,10 +464,20 @@ def write_docs(
         "task_branch_convention": task_branch_convention,
         "landing_policy": landing_policy,
     }
-    for template in sorted(TEMPLATE_DIR.glob("*.template")):
-        target = coordinator / template.name.removesuffix(".template")
-        if target.exists() and not force:
-            raise SystemExit(f"{target} already exists; rerun with --force to overwrite")
+    targets = [
+        (template, coordinator / template.name.removesuffix(".template"))
+        for template in sorted(TEMPLATE_DIR.glob("*.template"))
+    ]
+    if not force:
+        conflicts = [target for _template, target in targets if target.exists()]
+        if conflicts:
+            listing = "\n".join(f"- {target}" for target in conflicts)
+            raise SystemExit(
+                "Refusing to write: these adapter docs already exist and nothing was written:\n"
+                f"{listing}\n"
+                "Review them first; rerun with --force only if overwriting all of them is intended."
+            )
+    for template, target in targets:
         content = template.read_text().format(**values)
         target.write_text(content)
         written.append(target)
@@ -532,13 +542,22 @@ def main() -> int:
                 f"Suggested path: {suggested}"
             )
         coordinator = Path(args.coordinator).expanduser().resolve()
-        if coordinator in scanned_repo_paths(findings) and not is_dedicated_orchestration_repo(coordinator):
-            raise SystemExit(
-                f"Refusing to write orchestration docs into scanned implementation repo: {coordinator}. "
-                "Create or choose a dedicated <project-slug>-orchestration repo instead, "
-                "or rerun with --allow-implementation-coordinator if you intentionally want this."
-            )
-        if coordinator in scanned_repo_paths(findings) and args.allow_implementation_coordinator:
+        containing_repo = next(
+            (
+                repo
+                for repo in scanned_repo_paths(findings)
+                if coordinator == repo or repo in coordinator.parents
+            ),
+            None,
+        )
+        if containing_repo and not is_dedicated_orchestration_repo(containing_repo):
+            if not args.allow_implementation_coordinator:
+                raise SystemExit(
+                    f"Refusing to write orchestration docs inside scanned implementation repo {containing_repo} "
+                    f"(coordinator: {coordinator}). "
+                    "Create or choose a dedicated <project-slug>-orchestration repo instead, "
+                    "or rerun with --allow-implementation-coordinator if you intentionally want this."
+                )
             print(f"Warning: writing into scanned implementation repo by explicit override: {coordinator}")
         project_name = args.project_name or coordinator.name
         worktree_root = args.worktree_root or str(suggested_worktree_root(findings))

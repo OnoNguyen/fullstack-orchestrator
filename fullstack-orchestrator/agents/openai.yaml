@@ -1,4 +1,4 @@
 interface:
   display_name: "Fullstack Orchestrator"
-  short_description: "Reviewed full-stack project orchestration"
-  default_prompt: "Use $fullstack-orchestrator to bootstrap and coordinate this project."
+  short_description: "DDD and BDD project orchestration"
+  default_prompt: "Use $fullstack-orchestrator to bootstrap, compose, and verify this project."

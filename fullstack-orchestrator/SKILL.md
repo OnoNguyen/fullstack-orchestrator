@@ -1,6 +1,6 @@
 ---
 name: fullstack-orchestrator
-description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, task boards, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices, answering tasks/tsk task-board requests, coordinating frontend/backend/infra work, setting up AGENTS.md routing, or deciding which companion skills to recommend.
+description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, task boards, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices and their BDD acceptance scenarios, answering tasks/tsk task-board requests, coordinating frontend/backend/infra work, setting up AGENTS.md routing, recording evidence-backed skill-feedback candidates, or deciding which companion skills to recommend.
 ---
 
 # Fullstack Orchestrator
@@ -37,13 +37,32 @@ docs unless the user explicitly overrides that boundary.
 - `TASKS.md`: `tasks`/`tsk` board policy and action classification.
 - `GLOSSARY.md`: approved domain language and boundary terms.
 - `SLICES.md`: approved vertical slices, surfaces, dependencies, gates, and
-  merge order.
+  merge order, with BDD acceptance scenarios for important behavior.
 - `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks.
 - `DOCUMENTATION_POLICY.md`: canonical doc ownership and anti-duplication rules.
 - `STATUS.md`: coordinator-owned current state, not worker scratchpad.
+- `SKILL_FEEDBACK.md`: evidence-backed missing-skill, stale-skill, and
+  reusable-pattern candidates that may become reviewed skill PRs.
 
 See [project-adapter.md](references/project-adapter.md) for doc contracts and
 templates.
+
+## Domain Composer
+
+Compose the project like music: each subdomain is a distinct instrument, each
+bounded context has a clear part, and implementation surfaces are arranged so
+the whole product plays coherently. Use domain-driven design language to name
+boundaries and handoffs in `GLOSSARY.md` and `SLICES.md`, subject to the
+Operating Rule: the model is navigation until verified against live state.
+
+Prove the composition with behavior examples. For user-visible or
+cross-context slice behavior, draft 1-3 business-readable
+`Given / When / Then` scenarios in chat, tie each to a verification gate
+(automated test, contract check, QA step, runtime evidence, or deploy smoke),
+and record them with the slice in `SLICES.md` once the user approves it. If a
+scenario contradicts the current model, fix the glossary, slice, or plan
+before coding. The slice contract lives in
+[project-adapter.md](references/project-adapter.md).
 
 ## Onboarding Discipline
 
@@ -76,6 +95,20 @@ Use scripts as evidence collectors and validators, not as authority:
   project adapter defines an equivalent deploy trigger.
 - Use [qa-debug-deploy.md](references/qa-debug-deploy.md) when QA, debug,
   runtime evidence, deploy, retry, or release state is involved.
+
+## Skill Improvement Loop
+
+`SKILL_FEEDBACK.md` turns experience from an approved, validated orchestration
+repo into reviewed skill improvements; skills never mutate themselves. When a
+task surfaces repeated workflow friction, a missing companion skill, or stale
+skill behavior, draft an evidence-backed candidate in chat and append it to
+`SKILL_FEEDBACK.md` only after the user approves the entry. Apply a candidate
+to an installed skill only when the user asks for it in the current session —
+even if an upstream skill PR has already merged — validate the result (rerun
+the skill's bundled validators or a dry-run trigger test), and prefer a
+reviewed PR against the skill source when a remote exists. The candidate entry
+shape and rules live in the SKILL_FEEDBACK contract in
+[project-adapter.md](references/project-adapter.md).
 
 ## Companion Skills
 

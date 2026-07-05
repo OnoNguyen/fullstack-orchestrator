@@ -1,0 +1,21 @@
+# {project_name} Skill Feedback
+
+## Purpose
+
+Capture evidence-backed candidates for improving existing skills or creating
+new skills. This file is a review surface, not an automatic mutation channel.
+
+## Skill Improvement Candidates
+
+| Candidate | Evidence | Target skill or repo | Proposed change | Validation gate | Review or PR status |
+| --- | --- | --- | --- | --- | --- |
+| TODO | TODO | TODO | TODO | TODO | TODO |
+
+## Rules
+
+- Record only reusable workflow friction or repeated patterns that would help
+  future agents.
+- Link concrete evidence: repo paths, docs, logs, QA results, issues, or PRs.
+- Do not install, update, or publish skills from this file without explicit
+  user approval or an approved project trigger.
+- Prefer reviewed PRs against the skill source when a remote source exists.
