@@ -322,14 +322,12 @@ def suggested_worktree_root(findings: list[RepoFinding]) -> Path:
 
 
 def is_dedicated_orchestration_repo(path: Path) -> bool:
+    if any((path / marker).exists() for marker in IMPLEMENTATION_MARKERS):
+        return False
     name = path.name.lower()
     if any(token in name for token in ("orchestration", "orchestrator", "coordination")):
         return True
-    has_orchestration_docs = (path / "ORCHESTRATION.md").exists() and (path / "AGENTS.md").exists()
-    has_implementation_markers = any((path / marker).exists() for marker in IMPLEMENTATION_MARKERS)
-    if has_orchestration_docs and not has_implementation_markers:
-        return True
-    return False
+    return (path / "ORCHESTRATION.md").exists() and (path / "AGENTS.md").exists()
 
 
 def scanned_repo_paths(findings: list[RepoFinding]) -> set[Path]:
