@@ -53,9 +53,10 @@ Compose the project like music: each subdomain is a distinct instrument, each
 bounded context has a clear part, and implementation surfaces are arranged so
 the whole product plays coherently. Use domain-driven design language to name
 boundaries and handoffs in `GLOSSARY.md` and `SLICES.md`, subject to the
-Operating Rule: the model is navigation until verified against live state.
+Operating Rule: treat the domain model as navigation until verified against
+live state.
 
-Prove the composition with behavior examples. For user-visible or
+Prove the composition with behavior examples. For important user-visible or
 cross-context slice behavior, draft 1-3 business-readable
 `Given / When / Then` scenarios in chat, tie each to a verification gate
 (automated test, contract check, QA step, runtime evidence, or deploy smoke),

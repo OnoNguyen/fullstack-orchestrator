@@ -127,10 +127,9 @@ def find_repos(seed: Path) -> list[Path]:
     for current, dirs, _files in os.walk(seed):
         current_path = Path(current)
         rel_depth = len(current_path.relative_to(seed).parts)
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
         if ".git" in dirs:
             roots.add(current_path.resolve())
-            dirs.remove(".git")
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
         if rel_depth >= 3:
             dirs[:] = []
     return sorted(roots)
@@ -477,8 +476,10 @@ def write_docs(
                 f"{listing}\n"
                 "Review them first; rerun with --force only if overwriting all of them is intended."
             )
-    for template, target in targets:
-        content = template.read_text().format(**values)
+    renders = [
+        (target, template.read_text().format(**values)) for template, target in targets
+    ]
+    for target, content in renders:
         target.write_text(content)
         written.append(target)
     return written
@@ -542,13 +543,14 @@ def main() -> int:
                 f"Suggested path: {suggested}"
             )
         coordinator = Path(args.coordinator).expanduser().resolve()
-        containing_repo = next(
+        containing_repo = max(
             (
                 repo
                 for repo in scanned_repo_paths(findings)
                 if coordinator == repo or repo in coordinator.parents
             ),
-            None,
+            key=lambda repo: len(repo.parts),
+            default=None,
         )
         if containing_repo and not is_dedicated_orchestration_repo(containing_repo):
             if not args.allow_implementation_coordinator:
