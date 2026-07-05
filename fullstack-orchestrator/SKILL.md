@@ -41,8 +41,8 @@ docs unless the user explicitly overrides that boundary.
 - `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks.
 - `DOCUMENTATION_POLICY.md`: canonical doc ownership and anti-duplication rules.
 - `STATUS.md`: coordinator-owned current state, not worker scratchpad.
-- `SKILL_FEEDBACK.md`: evidence-backed missing-skill, stale-skill, and
-  reusable-pattern candidates that may become reviewed skill PRs.
+- `SKILL_FEEDBACK.md` (optional): evidence-backed missing-skill, stale-skill,
+  and reusable-pattern candidates that may become reviewed skill PRs.
 
 See [project-adapter.md](references/project-adapter.md) for doc contracts and
 templates.
@@ -61,9 +61,9 @@ cross-context slice behavior, draft 1-3 business-readable
 `Given / When / Then` scenarios in chat, tie each to a verification gate
 (automated test, contract check, QA step, runtime evidence, or deploy smoke),
 and record them with the slice in `SLICES.md` once the user approves it. If a
-scenario contradicts the current model, fix the glossary, slice, or plan
-before coding. The slice contract lives in
-[project-adapter.md](references/project-adapter.md).
+scenario contradicts the current model, propose the glossary, slice, or plan
+fix in chat and apply it once the user approves, before coding. The slice
+contract lives in [project-adapter.md](references/project-adapter.md).
 
 ## Onboarding Discipline
 
@@ -106,7 +106,8 @@ skill behavior, draft an evidence-backed candidate in chat and append it to
 `SKILL_FEEDBACK.md` only after the user approves the entry. Apply a candidate
 to an installed skill only when the user asks for it in the current session —
 even if an upstream skill PR has already merged — validate the result (rerun
-the skill's bundled validators or a dry-run trigger test), and prefer a
+the skill's bundled validators, or confirm the updated skill still triggers
+on a representative prompt without executing side effects), and prefer a
 reviewed PR against the skill source when a remote exists. The candidate entry
 shape and rules live in the SKILL_FEEDBACK contract in
 [project-adapter.md](references/project-adapter.md).

@@ -13,10 +13,11 @@ Use this shape for each approved slice:
 - Implementation surfaces:
 - Depends on:
 - Domain terms:
-- BDD scenarios:
+- BDD scenarios (1-3, each mapped to a verification gate):
   - Given:
-    When:
-    Then:
+  - When:
+  - Then:
+  - Gate:
 - Data/privacy/security boundary:
 - Verification:
 - Merge status/order:

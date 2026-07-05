@@ -124,10 +124,10 @@ def find_repos(seed: Path) -> list[Path]:
     if root:
         return [root]
     roots: set[Path] = set()
-    for current, dirs, _files in os.walk(seed):
+    for current, dirs, files in os.walk(seed):
         current_path = Path(current)
         rel_depth = len(current_path.relative_to(seed).parts)
-        if ".git" in dirs:
+        if ".git" in dirs or ".git" in files:
             roots.add(current_path.resolve())
         dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
         if rel_depth >= 3:
@@ -452,7 +452,6 @@ def write_docs(
     task_branch_convention: str,
     landing_policy: str,
 ) -> list[Path]:
-    coordinator.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
     values = {
         "project_name": project_name,
@@ -474,9 +473,15 @@ def write_docs(
                 f"{listing}\n"
                 "Review them first; rerun with --force only if overwriting all of them is intended."
             )
-    renders = [
-        (target, template.read_text().format(**values)) for template, target in targets
-    ]
+    renders = []
+    for template, target in targets:
+        try:
+            renders.append((target, template.read_text().format(**values)))
+        except (KeyError, IndexError, ValueError) as error:
+            raise SystemExit(
+                f"{template.name}: template render failed ({error!r}); nothing was written"
+            )
+    coordinator.mkdir(parents=True, exist_ok=True)
     for target, content in renders:
         target.write_text(content)
         written.append(target)
@@ -551,14 +556,35 @@ def main() -> int:
             default=None,
         )
         if containing_repo and not is_dedicated_orchestration_repo(containing_repo):
-            if not args.allow_implementation_coordinator:
-                raise SystemExit(
-                    f"Refusing to write orchestration docs inside scanned implementation repo {containing_repo} "
-                    f"(coordinator: {coordinator}). "
-                    "Create or choose a dedicated <project-slug>-orchestration repo instead, "
-                    "or rerun with --allow-implementation-coordinator if you intentionally want this."
+            # The coordinator may live in a dedicated orchestration git repo
+            # nested inside the scanned repo that scanning never descended into
+            # (git_root() short-circuits seeds that are already repos).
+            probe = coordinator
+            while not probe.exists() and probe != probe.parent:
+                probe = probe.parent
+            coordinator_repo = git_root(probe)
+            coordinator_in_dedicated_repo = (
+                coordinator_repo is not None
+                and coordinator_repo != containing_repo
+                and is_dedicated_orchestration_repo(coordinator_repo)
+            )
+            if not coordinator_in_dedicated_repo:
+                markers = [
+                    marker
+                    for marker in sorted(IMPLEMENTATION_MARKERS)
+                    if (containing_repo / marker).exists()
+                ]
+                marker_note = (
+                    f" (implementation markers at its root: {', '.join(markers)})" if markers else ""
                 )
-            print(f"Warning: writing into scanned implementation repo by explicit override: {coordinator}")
+                if not args.allow_implementation_coordinator:
+                    raise SystemExit(
+                        f"Refusing to write orchestration docs inside scanned implementation repo "
+                        f"{containing_repo}{marker_note} (coordinator: {coordinator}). "
+                        "Create or choose a dedicated <project-slug>-orchestration repo instead, "
+                        "or rerun with --allow-implementation-coordinator if you intentionally want this."
+                    )
+                print(f"Warning: writing into scanned implementation repo by explicit override: {coordinator}")
         project_name = args.project_name or coordinator.name
         worktree_root = args.worktree_root or str(suggested_worktree_root(findings))
         written = write_docs(
