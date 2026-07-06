@@ -8,7 +8,9 @@ monorepo, or multiple repositories.
 The skill runs a project scan, bootstraps a small project adapter in a dedicated
 orchestration repo, keeps `AGENTS.md` as a lazy root navigator, records approved
 repo topology and domain language, proposes vertical slices from evidence, and
-coordinates task boards, QA, debug, deploy, landing, and handoff.
+coordinates task boards, QA, debug, deploy, landing, and handoff. Over time,
+`groom`/`grm` audits the orchestration repo against per-doc size budgets so the
+docs stay a lean lazy-loading tree instead of a precontext tax.
 
 ## Install
 
@@ -29,7 +31,7 @@ a dedicated orchestration repo. Implementation repos stay as surfaces only:
 - `SLICES.md`: vertical slices, surfaces, BDD acceptance scenarios, gates,
   merge order
 - `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks
-- `DOCUMENTATION_POLICY.md`: doc ownership
+- `DOCUMENTATION_POLICY.md`: doc ownership, size budgets, grooming policy
 - `STATUS.md`: current state
 - `SKILL_FEEDBACK.md`: reviewed skill-improvement candidates (skills never
   self-mutate)

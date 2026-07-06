@@ -18,3 +18,36 @@
 - Do not turn `TASKS.md` into an issue tracker or status log.
 - Do not turn `STATUS.md` into a history log or scratchpad.
 - Do not store credentials in orchestration docs.
+
+## Size Budgets
+
+Soft line budgets keep the routing tree cheap to load. The adapter validator
+warns when a doc exceeds its budget; edit this table to tune budgets.
+
+| Doc | Budget |
+| --- | --- |
+| AGENTS.md | 60 |
+| STATUS.md | 40 |
+| DOCUMENTATION_POLICY.md | 60 |
+| ORCHESTRATION.md | 80 |
+| TASKS.md | 80 |
+| WORKTREES.md | 80 |
+| QA.md | 120 |
+| DEBUG.md | 120 |
+| DEPLOY.md | 120 |
+| GLOSSARY.md | 200 |
+| SLICES.md | 300 |
+| SKILL_FEEDBACK.md | 200 |
+
+## Grooming
+
+When the user says `groom` or `grm`:
+
+- Report first: line counts vs budgets, duplicated truth, orphan docs, dead
+  routes, stale references. Write nothing before approval.
+- Keep `AGENTS.md` a router: demote detail to the doc that owns it.
+- Archive over delete: move stale content to `archive/` under date-stamped
+  names such as `archive/STATUS-2026-07.md`. Deletion needs explicit approval.
+- Never route `archive/` from `AGENTS.md`; archived content stays out of the
+  precontext path.
+- Verify against live repo state before pruning topology or slice entries.
