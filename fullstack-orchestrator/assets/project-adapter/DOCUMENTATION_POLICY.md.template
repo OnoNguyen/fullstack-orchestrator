@@ -5,9 +5,10 @@
 - Repo topology lives in `ORCHESTRATION.md`.
 - Task-board command policy lives in `TASKS.md`.
 - Domain language lives in `GLOSSARY.md`.
-- Slice mapping and gates live in `SLICES.md`.
+- Slice mapping, BDD scenarios, and gates live in `SLICES.md`.
 - QA, debug, and deploy runbooks live in their matching docs.
 - Current state lives in `STATUS.md`.
+- Evidence-backed skill-improvement candidates live in `SKILL_FEEDBACK.md`.
 - Implementation specs, schemas, migrations, and code-level details live in the
   relevant implementation repo.
 

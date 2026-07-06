@@ -26,10 +26,13 @@ a dedicated orchestration repo. Implementation repos stay as surfaces only:
 - `TASKS.md`: `tasks`/`tsk` board policy and action boundaries
 - `WORKTREES.md`: task branches/worktrees, pickup points, landing, cleanup
 - `GLOSSARY.md`: canonical domain language
-- `SLICES.md`: vertical slices, surfaces, gates, merge order
+- `SLICES.md`: vertical slices, surfaces, BDD acceptance scenarios, gates,
+  merge order
 - `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks
 - `DOCUMENTATION_POLICY.md`: doc ownership
 - `STATUS.md`: current state
+- `SKILL_FEEDBACK.md`: reviewed skill-improvement candidates (skills never
+  self-mutate)
 
 ## Project Scan First
 

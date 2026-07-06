@@ -1,7 +1,7 @@
 # {project_name} Slices
 
 Vertical slices are useful cuts through project behavior. Define slices by
-intent first, then implementation surfaces.
+intent first, then behavior examples and implementation surfaces.
 
 ## Slices To Confirm
 
@@ -13,6 +13,11 @@ Use this shape for each approved slice:
 - Implementation surfaces:
 - Depends on:
 - Domain terms:
+- BDD scenarios (1-3, each mapped to a verification gate):
+  - Given:
+  - When:
+  - Then:
+  - Gate:
 - Data/privacy/security boundary:
 - Verification:
 - Merge status/order:

@@ -50,14 +50,16 @@ Report sections in this order:
 3. task-board command policy
 4. repo map
 5. glossary candidates and term conflicts
-6. vertical slice candidates
+6. vertical slice candidates, with BDD acceptance scenarios for the
+   important behavior in each accepted slice
 7. QA/debug/deploy gates
 8. companion skill recommendations
 
 ## Approval Rules
 
 Ask for approval section by section. Unreviewed findings stay in chat and must
-not be written to `ORCHESTRATION.md`, `GLOSSARY.md`, or `SLICES.md`.
+not be written to `ORCHESTRATION.md`, `GLOSSARY.md`, `SLICES.md`, or
+`SKILL_FEEDBACK.md`.
 
 When writing docs after approval:
 

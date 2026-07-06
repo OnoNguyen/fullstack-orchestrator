@@ -30,12 +30,13 @@ Recommended trigger rows:
 | tasks, tsk, task board, continue/abort candidates | `TASKS.md` |
 | task branches, worktrees, landing, cleanup | `WORKTREES.md` |
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
-| slice planning, gates, dependencies, merge order | `SLICES.md` |
+| slice planning, BDD scenarios, gates, dependencies, merge order | `SLICES.md` |
 | QA, runtime evidence, browser/device/simulator checks | `QA.md` |
 | debug or live runtime attach loops | `DEBUG.md` |
 | deploy, release, push, production verification | `DEPLOY.md` |
 | current pending state, blockers, landing, deploy state | `STATUS.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
+| missing skills, stale skills, reusable workflow patterns, skill PRs | `SKILL_FEEDBACK.md` |
 | editing an implementation repo | that repo's local instructions |
 
 ## ORCHESTRATION.md
@@ -99,6 +100,8 @@ slice should include:
 - implementation surfaces
 - dependencies
 - relevant glossary terms
+- 1-3 `Given / When / Then` BDD acceptance scenarios for important behavior,
+  each mapped to a verification gate
 - data/privacy/security boundary when relevant
 - verification gates
 - merge or landing order
@@ -108,6 +111,30 @@ slice should include:
 Keep current state small. It is not a history log or worker scratchpad. Use it
 for pending work, blockers, deploy state, verification state, and next action.
 
+## SKILL_FEEDBACK.md
+
+`SKILL_FEEDBACK.md` turns hardened project experience — experience from an
+orchestration repo whose adapter docs are approved and validated — into
+reviewed skill improvements without silently changing the agent. It is a
+review surface, not an automatic mutation channel.
+
+Each candidate entry should record:
+
+- observed task or friction
+- concrete evidence: repo paths, docs, logs, QA results, issues, or PRs
+- affected skill or proposed new skill
+- proposed change
+- validation gate
+- review or PR status
+
+Write policy:
+
+- Draft candidates in chat; append to `SKILL_FEEDBACK.md` only after the user
+  approves the entry.
+- Do not install, update, or publish skills from this file without explicit
+  user approval in the current session.
+- Prefer reviewed PRs against the skill source when a remote source exists.
+
 ## Documentation Policy
 
 Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
@@ -115,7 +142,8 @@ Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
 - glossary terms live in `GLOSSARY.md`
 - topology lives in `ORCHESTRATION.md`
 - task-board command policy lives in `TASKS.md`
-- slices and gates live in `SLICES.md`
+- slices, BDD scenarios, and gates live in `SLICES.md`
 - QA/debug/deploy runbooks live in their matching docs
+- evidence-backed skill-improvement candidates live in `SKILL_FEEDBACK.md`
 - implementation specs, schemas, migrations, and code-level docs live in the
   relevant implementation repo
