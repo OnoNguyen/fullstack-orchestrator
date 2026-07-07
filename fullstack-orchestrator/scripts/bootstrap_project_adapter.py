@@ -369,6 +369,10 @@ def propose_runbooks(findings: list[RepoFinding]) -> dict[str, list[str]]:
 def resolve_runbooks(selection: str, proposals: dict[str, list[str]]) -> dict[str, list[str]]:
     if selection.strip().lower() in {"", "none"}:
         return {}
+    reserved = {
+        template.name.removesuffix(".md.template").upper()
+        for template in TEMPLATE_DIR.glob("*.template")
+    }
     runbooks: dict[str, list[str]] = {}
     for raw in selection.split(","):
         name = raw.strip().upper().removesuffix(".MD")
@@ -377,8 +381,14 @@ def resolve_runbooks(selection: str, proposals: dict[str, list[str]]) -> dict[st
         if name == "AUTO":
             runbooks.update(proposals)
             continue
-        if not re.fullmatch(r"[A-Z0-9_-]+", name):
-            raise SystemExit(f"Invalid runbook name: {raw.strip()!r} (use letters, digits, _ or -)")
+        if name == "NONE":
+            raise SystemExit("--runbooks 'none' cannot be combined with runbook names")
+        if not re.fullmatch(r"[A-Z][A-Z0-9_-]*", name):
+            raise SystemExit(
+                f"Invalid runbook name: {raw.strip()!r} (start with a letter; letters, digits, _ or -)"
+            )
+        if name in reserved:
+            raise SystemExit(f"Runbook name collides with core adapter doc: {name}.md")
         runbooks[name] = proposals.get(name, [])
     return runbooks
 
@@ -552,6 +562,14 @@ def write_docs(
             or "- (add evidence after review)",
         }
         targets.append((RUNBOOK_TEMPLATE, coordinator / f"{name}.md", runbook_values))
+    seen: dict[Path, str] = {}
+    for template, target, _values in targets:
+        if target in seen:
+            raise SystemExit(
+                f"Duplicate write target {target} (from {seen[target]} and {template.name}); "
+                "nothing was written"
+            )
+        seen[target] = template.name
     if not force:
         conflicts = [target for _template, target, _values in targets if target.exists()]
         if conflicts:
@@ -564,11 +582,12 @@ def write_docs(
     renders = []
     for template, target, template_values in targets:
         try:
-            renders.append((target, template.read_text().format(**template_values)))
+            content = template.read_text().format(**template_values)
         except (KeyError, IndexError, ValueError) as error:
             raise SystemExit(
                 f"{template.name}: template render failed ({error!r}); nothing was written"
             )
+        renders.append((target, re.sub(r"\n{3,}", "\n\n", content)))
     coordinator.mkdir(parents=True, exist_ok=True)
     for target, content in renders:
         target.write_text(content)

@@ -35,6 +35,8 @@ def load_manifest(path: Path) -> list[dict[str, Any]]:
         data = json.loads(path.read_text())
     except (OSError, json.JSONDecodeError) as exc:
         raise SystemExit(f"Could not load manifest {path}: {exc}") from exc
+    if not isinstance(data, dict):
+        raise SystemExit(f"Manifest {path} must be a JSON object with a skills list")
     skills = data.get("skills", [])
     if not isinstance(skills, list):
         raise SystemExit(f"Manifest {path} must contain a skills list")

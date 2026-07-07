@@ -2,9 +2,9 @@
 
 Trigger: {runbook_trigger}
 
-This runbook exists because the project shows matching surfaces. Keep it
-project-specific: exact commands, gates, and owners. Generic doctrine lives in
-the orchestrator skill references, not here.
+This runbook exists for a pattern this project shows or the user named. Keep
+it project-specific: exact commands, gates, and owners. Generic doctrine lives
+in the orchestrator skill references, not here.
 
 ## Preconditions
 

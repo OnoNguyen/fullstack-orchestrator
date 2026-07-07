@@ -121,12 +121,19 @@ def validate(root: Path, strict: bool) -> tuple[list[str], list[str]]:
         if len(lines) > 60:
             message = f"AGENTS.md has {len(lines)} lines; keep root navigator under 60"
             (errors if strict else warnings).append(message)
-        routed = set(ROUTED_DOC_PATTERN.findall(agents_text)) - {"AGENTS.md"}
+        routed: set[str] = set()
+        for line in agents_text.splitlines():
+            if line.strip().startswith("|"):
+                routed.update(ROUTED_DOC_PATTERN.findall(line))
+        routed -= {"AGENTS.md"}
         for doc in sorted(routed):
             if not (root / doc).exists():
                 errors.append(f"AGENTS.md routes to missing doc: {doc}")
         for doc in root_docs:
-            if doc not in agents_text:
+            if doc in routed:
+                continue
+            # Word-boundary match so e.g. DEVICE_QA.md cannot satisfy QA.md.
+            if not re.search(rf"(?<![A-Za-z0-9_-]){re.escape(doc)}", agents_text):
                 warnings.append(f"AGENTS.md does not route to {doc}")
         for ref in sorted(set(DOC_ROUTE.findall(agents_text))):
             if not (root / ref).exists():

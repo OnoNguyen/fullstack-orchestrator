@@ -79,7 +79,7 @@ contract lives in [project-adapter.md](references/project-adapter.md).
 Scan only user-provided local paths or URLs. Keep unreviewed findings in chat,
 not canonical docs. Ask the user to create or confirm a dedicated orchestration
 repo, then approve findings section by section before writing docs: repo map,
-worktree policy, task-board policy, glossary, slices, QA/debug/deploy.
+worktree policy, task-board policy, glossary, slices, runbook proposals.
 
 Use scripts as evidence collectors and validators, not as authority:
 
@@ -87,7 +87,8 @@ Use scripts as evidence collectors and validators, not as authority:
   approval, write adapter docs.
 - `scripts/validate_project_adapter.py`: check adapter docs for required
   structure, doc size budgets, and low-precontext routing.
-- `scripts/recommend_skills.py`: suggest companion skills for the project shape.
+- `scripts/recommend_skills.py`: detect companion-skill categories from stack
+  evidence; skill names resolve live per the Companion Skills section.
 
 ## Work Execution
 

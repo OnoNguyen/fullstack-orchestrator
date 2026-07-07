@@ -17,6 +17,8 @@ resolves actual skill names live.
 2. **Project-supplied manifest.** Teams may curate their own inventory in the
    orchestration repo and pass it to `scripts/recommend_skills.py --manifest`.
    This is the one legitimately static source, because the team maintains it.
+   By convention, look for `companion-skills.json` at the orchestration repo
+   root, or a path routed from `DOCUMENTATION_POLICY.md`.
 3. **Public catalogs.** Search skills.sh or marketplace listings only when the
    user asks for install suggestions. Print install commands only from a
    verified source or the project manifest.
