@@ -8,6 +8,13 @@ dedicated orchestration repo, usually named `<project-slug>-orchestration`.
 Keep repo-specific implementation notes inside the implementation repos.
 Implementation repos are surfaces only by default.
 
+The adapter has two tiers. Core coordination docs exist in every project:
+`AGENTS.md`, `ORCHESTRATION.md`, `TASKS.md`, `WORKTREES.md`, `GLOSSARY.md`,
+`SLICES.md`, `DOCUMENTATION_POLICY.md`, `STATUS.md` (plus optional
+`SKILL_FEEDBACK.md`). Runbooks are emergent: one pattern-named doc per stack
+pattern the project actually has, created on approval — never a fixed set of
+stubs.
+
 ## AGENTS.md
 
 `AGENTS.md` is the root navigator. It should usually be under 60 lines.
@@ -22,6 +29,11 @@ It must contain:
 It must not contain long runbooks, credentials, full glossary terms, detailed
 slice specs, status history, schemas, migrations, or implementation specs.
 
+The trigger table is the adapter's doc manifest. Router integrity is the
+contract that replaces a fixed doc list: every adapter doc is routed from
+this table, and every routed doc exists. `validate_project_adapter.py`
+enforces both directions, which keeps emergent runbooks discoverable.
+
 Recommended trigger rows:
 
 | Trigger | Read |
@@ -31,14 +43,14 @@ Recommended trigger rows:
 | task branches, worktrees, landing, cleanup | `WORKTREES.md` |
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
 | slice planning, BDD scenarios, gates, dependencies, merge order | `SLICES.md` |
-| QA, runtime evidence, browser/device/simulator checks | `QA.md` |
-| debug or live runtime attach loops | `DEBUG.md` |
-| deploy, release, push, production verification | `DEPLOY.md` |
 | current pending state, blockers, landing, deploy state | `STATUS.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
 | groom, grm, doc bloat, size budgets | `DOCUMENTATION_POLICY.md` |
 | missing skills, stale skills, reusable workflow patterns, skill PRs | `SKILL_FEEDBACK.md` |
 | editing an implementation repo | that repo's local instructions |
+
+Add one row per runbook as runbooks are created, e.g. `QA, qa, runtime
+evidence | QA.md` or `background jobs, workers, queues | JOBS.md`.
 
 ## ORCHESTRATION.md
 
@@ -112,6 +124,33 @@ slice should include:
 Keep current state small. It is not a history log or worker scratchpad. Use it
 for pending work, blockers, deploy state, verification state, and next action.
 
+## Runbooks
+
+Runbooks are pattern-named operational docs created only when the stack shows
+the pattern: `QA.md`, `DEBUG.md`, `DEPLOY.md`, `JOBS.md`, or a new name for a
+new pattern (`MODEL_EVAL.md`, `MIGRATIONS.md`, `DEVICE_QA.md`, ...). A stack
+without a pattern gets no stub for it — empty scaffolding is noise the
+Operating Rule exists to avoid.
+
+Every runbook follows one contract:
+
+- **Trigger**: the task signals that route here (mirrored in `AGENTS.md`)
+- **Preconditions**: approved state required before running
+- **Steps**: numbered, verifiable, with exact project-specific commands
+- **Evidence**: scan findings or observed surfaces that justify the runbook
+- **Rollback / Escape**: how to stop, revert, or safely abandon a failed run
+
+Creation flow: the project scan proposes runbooks from evidence
+(`bootstrap_project_adapter.py` writes the approved set via `--runbooks`);
+new patterns discovered later go through the same review — propose in chat,
+user approves, write the doc from the runbook contract, add its `AGENTS.md`
+trigger row. One canonical runbook per pattern; do not fork variants of the
+same pattern into multiple docs.
+
+Keep generic doctrine (QA method choice, deploy discipline, retry budgets) in
+the orchestrator skill references; runbooks hold only project-specific
+commands, gates, and owners.
+
 ## SKILL_FEEDBACK.md
 
 `SKILL_FEEDBACK.md` turns hardened project experience — experience from an
@@ -144,7 +183,7 @@ Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
 - topology lives in `ORCHESTRATION.md`
 - task-board command policy lives in `TASKS.md`
 - slices, BDD scenarios, and gates live in `SLICES.md`
-- QA/debug/deploy runbooks live in their matching docs
+- runbooks live in their pattern-named docs, one canonical runbook per pattern
 - evidence-backed skill-improvement candidates live in `SKILL_FEEDBACK.md`
 - implementation specs, schemas, migrations, and code-level docs live in the
   relevant implementation repo

@@ -1,5 +1,11 @@
 # QA, Debug, Deploy, And Landing
 
+This doctrine is generic; project-specific commands, gates, and owners live in
+the adapter's pattern runbooks (`QA.md`, `DEBUG.md`, `DEPLOY.md`, ...) when
+they exist. If the stack shows a pattern that has no runbook yet, propose
+creating one from the runbook contract in
+[project-adapter.md](project-adapter.md) instead of improvising.
+
 ## QA
 
 QA and deployment are separate requests. When QA is requested:

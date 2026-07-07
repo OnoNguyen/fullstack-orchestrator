@@ -6,7 +6,8 @@
 - Task-board command policy lives in `TASKS.md`.
 - Domain language lives in `GLOSSARY.md`.
 - Slice mapping, BDD scenarios, and gates live in `SLICES.md`.
-- QA, debug, and deploy runbooks live in their matching docs.
+- Runbooks live in their pattern-named docs, one canonical runbook per
+  pattern, each routed from `AGENTS.md`.
 - Current state lives in `STATUS.md`.
 - Evidence-backed skill-improvement candidates live in `SKILL_FEEDBACK.md`.
 - Implementation specs, schemas, migrations, and code-level details live in the

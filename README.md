@@ -30,11 +30,13 @@ a dedicated orchestration repo. Implementation repos stay as surfaces only:
 - `GLOSSARY.md`: canonical domain language
 - `SLICES.md`: vertical slices, surfaces, BDD acceptance scenarios, gates,
   merge order
-- `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks
 - `DOCUMENTATION_POLICY.md`: doc ownership, size budgets, grooming policy
 - `STATUS.md`: current state
 - `SKILL_FEEDBACK.md`: reviewed skill-improvement candidates (skills never
   self-mutate)
+- Pattern runbooks (`QA.md`, `DEBUG.md`, `DEPLOY.md`, `JOBS.md`, or new
+  pattern names): proposed from scan evidence, written only for patterns the
+  stack actually shows, each routed from `AGENTS.md`
 
 ## Project Scan First
 
@@ -61,7 +63,8 @@ Validate the adapter:
 python3 fullstack-orchestrator/scripts/validate_project_adapter.py /path/to/orchestration
 ```
 
-Recommend companion skills:
+Detect companion-skill categories (names resolve live against installed
+skills and optional project manifests — no bundled inventory):
 
 ```bash
 python3 fullstack-orchestrator/scripts/recommend_skills.py --project /path/to/orchestration /path/to/app /path/to/api

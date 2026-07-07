@@ -2,76 +2,56 @@
 
 ## Principle
 
-This skill recommends companion skills but does not bundle them or assume they
-are installed. Print install commands only when a public source is verified or
-the project supplies an override manifest with an install source.
+Recommend companion skills from what the stack needs, not from a shipped
+inventory. Skill names and marketplaces change faster than this skill
+releases, so a bundled catalog can only decay; capability categories are the
+stable knowledge. This skill therefore ships the category taxonomy and
+resolves actual skill names live.
 
-Use the public catalog in `assets/companion-skills.json` as defaults. Teams may
-add their own manifest in the orchestration repo and pass it to
-`scripts/recommend_skills.py --manifest`.
+## Resolution Order
 
-## Core Orchestration
+1. **Session-installed skills.** The agent can see which skills are actually
+   available in the current session. Match detected categories against that
+   list first — never recommend installing something already present, and
+   never assume something absent is installed.
+2. **Project-supplied manifest.** Teams may curate their own inventory in the
+   orchestration repo and pass it to `scripts/recommend_skills.py --manifest`.
+   This is the one legitimately static source, because the team maintains it.
+3. **Public catalogs.** Search skills.sh or marketplace listings only when the
+   user asks for install suggestions. Print install commands only from a
+   verified source or the project manifest.
 
-Recommend for most projects:
+Never install, update, or enable a skill without explicit user approval.
+Prefer well-known publishers when suggesting from public catalogs, and say
+when a suggestion is unvetted.
 
-- `git-workflow-and-versioning`
-- `context-engineering`
-- `planning-and-task-breakdown`
-- `documentation-and-adrs`
-- `code-review-and-quality`
-- `test-driven-development`
+When a detected category has no installed or discoverable skill that fits,
+that gap is a `SKILL_FEEDBACK.md` candidate: record the category, the
+evidence, and what a fitting skill would do.
 
-## Frontend And Product UI
+## Category Taxonomy
 
-Recommend when scanning frontend, mobile, design-system, browser, CSS, canvas,
-accessibility, or product UI surfaces:
+`scripts/recommend_skills.py` detects these categories from repo evidence:
 
-- `frontend-ui-engineering`
-- `browser-testing-with-devtools`
-- `performance-optimization`
-- `prototype`
-- `vocabulary`
+- **core** (every project): git workflow, planning and task breakdown, code
+  review, test-driven development, documentation/ADR capture.
+- **frontend** (UI, mobile, browser, CSS, accessibility surfaces): UI
+  engineering, browser/device runtime QA, performance optimization,
+  prototyping.
+- **backend** (API, service, auth, database, queue, schema surfaces): API and
+  interface design, security hardening, debugging and diagnosis,
+  source-grounded framework work.
+- **delivery** (CI, deploy, release, cloud, packaging surfaces): CI/CD
+  automation, shipping and launch, GitHub workflow, incremental landing.
+- **planning** (ambiguous, strategic, architecture-heavy work): spec writing,
+  idea refinement, requirement interviews, adversarial design review,
+  architecture improvement.
+- **handoff** (work-item and ownership boundaries): triage, PRD/issue
+  conversion, agent-to-agent handoff, skill discovery.
 
-## Backend And API
+## Project Manifest Schema
 
-Recommend when scanning API, service, auth, database, queue, schema, worker, or
-integration surfaces:
-
-- `api-and-interface-design`
-- `security-and-hardening`
-- `source-driven-development`
-- `debugging-and-error-recovery`
-- `diagnose`
-
-## Delivery And Ops
-
-Recommend when scanning CI, deploy, release, cloud, packaging, infra, GitHub, or
-workflow automation:
-
-- `ci-cd-and-automation`
-- `shipping-and-launch`
-- `github`
-- `incremental-implementation`
-
-## Planning And Product Thinking
-
-Recommend when work is ambiguous, strategic, cross-domain, architecture-heavy,
-or needs sharper product/domain language:
-
-- `spec-driven-development`
-- `idea-refine`
-- `interview-me`
-- `grill-with-docs`
-- `doubt-driven-development`
-- `improve-codebase-architecture`
-
-## Issue And Handoff Work
-
-Recommend when turning plans into work items, triaging queues, preparing another
-agent, or preserving state:
-
-- `triage`
-- `to-prd`
-- `to-issues`
-- `handoff`
-- `find-skills`
+A project manifest is JSON with a `skills` list; each entry may set `name`,
+`category` (one of the taxonomy categories), `priority` (high/medium/low),
+`when`, `notes`, and `install_command`. Multiple `--manifest` files merge by
+name, later files winning.

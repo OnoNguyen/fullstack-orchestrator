@@ -29,7 +29,10 @@ Create or confirm a repo named `<project-slug>-orchestration` by default.
 Implementation repos are surfaces only and should not hold shared orchestration
 docs unless the user explicitly overrides that boundary.
 
-- `AGENTS.md`: root navigator and lazy trigger router only.
+Core docs every project gets:
+
+- `AGENTS.md`: root navigator and trigger router; its table is the doc
+  manifest — every adapter doc is routed there, and every routed doc exists.
 - `ORCHESTRATION.md`: approved repo map, aliases, roles, remotes, branches,
   and ownership.
 - `WORKTREES.md`: task checkout/worktree policy, canonical pickup points,
@@ -38,15 +41,20 @@ docs unless the user explicitly overrides that boundary.
 - `GLOSSARY.md`: approved domain language and boundary terms.
 - `SLICES.md`: approved vertical slices, surfaces, dependencies, gates, and
   merge order, with BDD acceptance scenarios for important behavior.
-- `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks.
 - `DOCUMENTATION_POLICY.md`: canonical doc ownership, anti-duplication rules,
   doc size budgets, and grooming policy.
 - `STATUS.md`: coordinator-owned current state, not worker scratchpad.
 - `SKILL_FEEDBACK.md` (optional): evidence-backed missing-skill, stale-skill,
   and reusable-pattern candidates that may become reviewed skill PRs.
 
-See [project-adapter.md](references/project-adapter.md) for doc contracts and
-templates.
+Runbooks are emergent, not predefined: one pattern-named doc per stack
+pattern the project actually shows (`QA.md`, `DEBUG.md`, `DEPLOY.md`,
+`JOBS.md`, or a new name for a new pattern), proposed from scan evidence,
+written only after user approval, and routed in `AGENTS.md`. A stack without
+a pattern gets no stub for it.
+
+See [project-adapter.md](references/project-adapter.md) for doc contracts,
+the runbook contract, and templates.
 
 ## Domain Composer
 
@@ -118,7 +126,10 @@ shape and rules live in the SKILL_FEEDBACK contract in
 
 ## Companion Skills
 
-Recommend companion skills when the project shape or task calls for specialized
-help. Do not assume they are installed. Print install suggestions only when a
-public source is verified or supplied by the project. See
+Detect capability categories from stack evidence
+(`scripts/recommend_skills.py`), then resolve skill names live rather than
+from a bundled catalog: check the skills actually installed in the session
+first, then a project-supplied manifest, and search public catalogs only when
+the user asks for install suggestions. Never install without approval; record
+gaps no live source can fill as `SKILL_FEEDBACK.md` candidates. See
 [companion-skills.md](references/companion-skills.md).
