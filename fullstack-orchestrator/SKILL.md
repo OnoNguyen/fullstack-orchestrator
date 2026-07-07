@@ -1,6 +1,6 @@
 ---
 name: fullstack-orchestrator
-description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, task boards, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices and their BDD acceptance scenarios, answering tasks/tsk task-board requests, coordinating frontend/backend/infra work, setting up AGENTS.md routing, recording evidence-backed skill-feedback candidates, or deciding which companion skills to recommend.
+description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, task boards, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices and their BDD acceptance scenarios, answering tasks/tsk task-board requests, grooming bloated orchestration docs on groom/grm, coordinating frontend/backend/infra work, setting up AGENTS.md routing, recording evidence-backed skill-feedback candidates, or deciding which companion skills to recommend.
 ---
 
 # Fullstack Orchestrator
@@ -39,7 +39,8 @@ docs unless the user explicitly overrides that boundary.
 - `SLICES.md`: approved vertical slices, surfaces, dependencies, gates, and
   merge order, with BDD acceptance scenarios for important behavior.
 - `QA.md`, `DEBUG.md`, `DEPLOY.md`: project-specific runbooks.
-- `DOCUMENTATION_POLICY.md`: canonical doc ownership and anti-duplication rules.
+- `DOCUMENTATION_POLICY.md`: canonical doc ownership, anti-duplication rules,
+  doc size budgets, and grooming policy.
 - `STATUS.md`: coordinator-owned current state, not worker scratchpad.
 - `SKILL_FEEDBACK.md` (optional): evidence-backed missing-skill, stale-skill,
   and reusable-pattern candidates that may become reviewed skill PRs.
@@ -77,7 +78,7 @@ Use scripts as evidence collectors and validators, not as authority:
 - `scripts/bootstrap_project_adapter.py`: scan user-provided seeds and, after
   approval, write adapter docs.
 - `scripts/validate_project_adapter.py`: check adapter docs for required
-  structure and low-precontext routing.
+  structure, doc size budgets, and low-precontext routing.
 - `scripts/recommend_skills.py`: suggest companion skills for the project shape.
 
 ## Work Execution
@@ -86,6 +87,9 @@ Use scripts as evidence collectors and validators, not as authority:
   product slice itself.
 - When the user says `tasks` or `tsk`, load `TASKS.md` and produce an
   actionable-only board before recommending continuations.
+- When the user says `groom` or `grm`, audit the orchestration repo for doc
+  bloat and produce a review-first groom report before editing any doc. See
+  [grooming.md](references/grooming.md).
 - Prefer temporary task branches/worktrees when the project adapter defines
   them.
 - For cross-repo changes, use all-or-hold landing: no repo lands until every

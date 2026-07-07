@@ -36,6 +36,7 @@ Recommended trigger rows:
 | deploy, release, push, production verification | `DEPLOY.md` |
 | current pending state, blockers, landing, deploy state | `STATUS.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
+| groom, grm, doc bloat, size budgets | `DOCUMENTATION_POLICY.md` |
 | missing skills, stale skills, reusable workflow patterns, skill PRs | `SKILL_FEEDBACK.md` |
 | editing an implementation repo | that repo's local instructions |
 
@@ -147,3 +148,14 @@ Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
 - evidence-backed skill-improvement candidates live in `SKILL_FEEDBACK.md`
 - implementation specs, schemas, migrations, and code-level docs live in the
   relevant implementation repo
+
+It also owns the grooming policy for the `groom`/`grm` trigger:
+
+- a Size Budgets table with soft per-doc line budgets, enforced as validator
+  warnings (errors with `--strict`)
+- report-first grooming: propose findings in chat, apply only approved moves
+- archive over delete: stale content moves to `archive/` under date-stamped
+  names; `AGENTS.md` must never route into `archive/`
+
+The groom procedure and bloat patterns live in
+[grooming.md](grooming.md).
