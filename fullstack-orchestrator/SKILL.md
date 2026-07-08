@@ -99,10 +99,15 @@ Use scripts as evidence collectors and validators, not as authority:
 - When the user says `groom` or `grm`, audit the orchestration repo for doc
   bloat and produce a review-first groom report before editing any doc. See
   [grooming.md](references/grooming.md).
-- When the user says `update` or `upd`, run the review-first update pipeline:
-  pull the latest skill from its remote into every install root, reconcile the
-  current project's docs to the new templates (scaffolding and policy only), then
-  groom. See [updating.md](references/updating.md).
+- When the user gives `update` or `upd` as an explicit standalone command (or an
+  unambiguous phrase like "update the orchestrator skill"), run the review-first
+  update pipeline: pull the latest skill from its remote into every install root,
+  reconcile the current project's docs to the new templates (scaffolding and
+  policy only), then groom. This is a scoped skill directive, not a match on the
+  common verb: ordinary requests that merely contain "update" ("update the API
+  docs", "update dependencies", "update the board") are normal project edits and
+  must not enter this pipeline. If intent is ambiguous, ask before starting — this
+  path can mutate installed skill files. See [updating.md](references/updating.md).
 - Prefer temporary task branches/worktrees when the project adapter defines
   them; fetch and reconcile against the remote before basing task work — base on
   the remote canonical branch when local is behind, and surface divergence
