@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Recommend companion skills for a project shape."""
+"""Detect companion-skill categories for a project shape.
+
+This script names capability categories from stack evidence; it deliberately
+ships no skill inventory. Skill names rot faster than skill packages release,
+so name resolution happens live: the session's installed skills first, then a
+project-supplied manifest (--manifest), then public catalogs only when the
+user asks for install suggestions.
+"""
 
 from __future__ import annotations
 
@@ -11,9 +18,16 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MANIFEST = ROOT / "assets" / "companion-skills.json"
 SKIP_DIRS = {".git", "node_modules", ".next", "dist", "build", "target", ".venv", "__pycache__"}
+
+CATEGORY_GUIDANCE = {
+    "core": "git workflow, planning/task breakdown, code review, test-driven development, docs/ADR skills",
+    "frontend": "UI engineering, browser/device runtime QA, performance skills",
+    "backend": "API/interface design, security hardening, debugging/diagnosis skills",
+    "delivery": "CI/CD, release and launch, GitHub workflow skills",
+    "planning": "spec and idea refinement, architecture review, adversarial design-review skills",
+    "handoff": "triage, PRD/issue conversion, agent handoff skills",
+}
 
 
 def load_manifest(path: Path) -> list[dict[str, Any]]:
@@ -21,6 +35,8 @@ def load_manifest(path: Path) -> list[dict[str, Any]]:
         data = json.loads(path.read_text())
     except (OSError, json.JSONDecodeError) as exc:
         raise SystemExit(f"Could not load manifest {path}: {exc}") from exc
+    if not isinstance(data, dict):
+        raise SystemExit(f"Manifest {path} must be a JSON object with a skills list")
     skills = data.get("skills", [])
     if not isinstance(skills, list):
         raise SystemExit(f"Manifest {path} must contain a skills list")
@@ -107,30 +123,49 @@ def main() -> int:
     categories = detect_categories(paths) if paths else {"core"}
     categories.update(args.category)
 
-    manifests = [DEFAULT_MANIFEST, *[Path(p).expanduser().resolve() for p in args.manifest]]
-    skills = merge_skills(manifests)
-    selected = [s for s in skills if s.get("category") in categories]
-    selected.sort(key=lambda item: (priority_rank(str(item.get("priority", ""))), str(item.get("category")), str(item.get("name"))))
-
-    print("# Companion Skill Recommendations")
+    print("# Companion Skill Categories")
     print("")
     print("Detected categories: " + ", ".join(sorted(categories)))
     print("")
-    for skill in selected:
-        print(f"## {skill.get('name')}")
+    for category in sorted(categories):
+        guidance = CATEGORY_GUIDANCE.get(category, "specialized skills for this category")
+        print(f"- {category}: {guidance}")
+    print("")
+    print("## Resolve Names Live")
+    print("")
+    print("This catalog ships no skill inventory by design. Resolve in order:")
+    print("")
+    print("1. Skills already installed in the session — check before recommending.")
+    print("2. A project-supplied manifest (`--manifest`), curated by the team.")
+    print("3. Public catalogs (skills.sh, marketplaces) only when the user asks")
+    print("   for install suggestions; never install without approval.")
+    print("")
+    print("Record category gaps no live source can fill as `SKILL_FEEDBACK.md`")
+    print("candidates.")
+
+    manifests = [Path(p).expanduser().resolve() for p in args.manifest]
+    if manifests:
+        skills = merge_skills(manifests)
+        selected = [s for s in skills if s.get("category") in categories]
+        selected.sort(key=lambda item: (priority_rank(str(item.get("priority", ""))), str(item.get("category")), str(item.get("name"))))
         print("")
-        print(f"- Category: {skill.get('category')}")
-        print(f"- Priority: {skill.get('priority')}")
-        print(f"- When: {skill.get('when')}")
-        notes = skill.get("notes")
-        if notes:
-            print(f"- Notes: {notes}")
-        command = skill.get("install_command")
-        if command:
-            print(f"- Install: `{command}`")
-        else:
-            print("- Install: no verified public install source in this manifest")
+        print("## Project Manifest Matches")
         print("")
+        for skill in selected:
+            print(f"### {skill.get('name')}")
+            print("")
+            print(f"- Category: {skill.get('category')}")
+            print(f"- Priority: {skill.get('priority')}")
+            print(f"- When: {skill.get('when')}")
+            notes = skill.get("notes")
+            if notes:
+                print(f"- Notes: {notes}")
+            command = skill.get("install_command")
+            if command:
+                print(f"- Install: `{command}`")
+            else:
+                print("- Install: no install source in the project manifest")
+            print("")
     return 0
 
 

@@ -23,5 +23,5 @@ cross-repo landing, and cleanup.
 
 ## Deploy Authority
 
-- Deployment requires an explicit deploy trigger from the user or this project's
-  `DEPLOY.md`.
+- Deployment requires an explicit deploy trigger from the user, or a
+  project-defined trigger in the deploy runbook (`DEPLOY.md`) when one exists.

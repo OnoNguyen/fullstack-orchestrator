@@ -52,8 +52,9 @@ Report sections in this order:
 5. glossary candidates and term conflicts
 6. vertical slice candidates, with BDD acceptance scenarios for the
    important behavior in each accepted slice
-7. QA/debug/deploy gates
-8. companion skill recommendations
+7. runbook proposals from detected stack patterns, with QA/debug/deploy gates
+8. companion skill categories (names resolve live; see
+   [companion-skills.md](companion-skills.md))
 
 ## Approval Rules
 

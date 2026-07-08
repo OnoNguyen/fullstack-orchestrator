@@ -9,6 +9,9 @@ import sys
 from pathlib import Path
 
 
+# Core coordination docs every project needs. Runbooks (QA.md, DEPLOY.md, ...)
+# are emergent per stack pattern and validated through router integrity below,
+# not through a fixed name list.
 REQUIRED_FILES = {
     "AGENTS.md": ["Trigger Router", "Default Discipline"],
     "ORCHESTRATION.md": ["Repositories"],
@@ -16,9 +19,6 @@ REQUIRED_FILES = {
     "WORKTREES.md": ["Canonical Pickup Points", "Cross-Repo Landing"],
     "GLOSSARY.md": [],
     "SLICES.md": [],
-    "QA.md": [],
-    "DEBUG.md": [],
-    "DEPLOY.md": [],
     "DOCUMENTATION_POLICY.md": [],
     "STATUS.md": [],
 }
@@ -47,6 +47,7 @@ DEFAULT_BUDGETS = {
 
 BUDGET_ROW = re.compile(r"^\|\s*`?([A-Z_]+\.md)`?\s*\|\s*(\d+)\s*\|", re.MULTILINE)
 DOC_ROUTE = re.compile(r"`([A-Za-z0-9_./-]+\.md)`")
+ROUTED_DOC_PATTERN = re.compile(r"`([A-Za-z0-9][A-Za-z0-9_.-]*\.md)`")
 
 
 def read(path: Path) -> str:
@@ -76,22 +77,26 @@ def validate(root: Path, strict: bool) -> tuple[list[str], list[str]]:
         for heading in headings:
             if heading not in content:
                 errors.append(f"{name} missing heading text: {heading}")
-        lowered = content.lower()
-        for marker in FORBIDDEN_MARKERS:
-            if marker in lowered:
-                errors.append(f"{name} contains unreviewed marker: {marker}")
 
-    present_optional: list[str] = []
     for name, headings in OPTIONAL_FILES.items():
         path = root / name
         if not path.exists():
             continue
-        present_optional.append(name)
         content = read(path)
         for heading in headings:
             if heading not in content:
                 warnings.append(f"{name} missing heading text: {heading}")
-        lowered = content.lower()
+
+    # Router integrity: AGENTS.md's trigger table is the doc manifest. Every
+    # routed doc must exist, and every adapter doc must be routed, so emergent
+    # runbooks stay discoverable without a fixed required-name list.
+    root_docs = sorted(
+        path.name
+        for path in root.glob("*.md")
+        if path.name not in {"AGENTS.md", "README.md"}
+    )
+    for name in root_docs:
+        lowered = read(root / name).lower()
         for marker in FORBIDDEN_MARKERS:
             if marker in lowered:
                 errors.append(f"{name} contains unreviewed marker: {marker}")
@@ -109,11 +114,26 @@ def validate(root: Path, strict: bool) -> tuple[list[str], list[str]]:
     agents = root / "AGENTS.md"
     if agents.exists():
         agents_text = read(agents)
-        for doc in REQUIRED_FILES:
-            if doc != "AGENTS.md" and doc not in agents_text:
-                warnings.append(f"AGENTS.md does not route to {doc}")
-        for doc in present_optional:
-            if doc not in agents_text:
+        for marker in FORBIDDEN_MARKERS:
+            if marker in agents_text.lower():
+                errors.append(f"AGENTS.md contains unreviewed marker: {marker}")
+        lines = agents_text.splitlines()
+        if len(lines) > 60:
+            message = f"AGENTS.md has {len(lines)} lines; keep root navigator under 60"
+            (errors if strict else warnings).append(message)
+        routed: set[str] = set()
+        for line in agents_text.splitlines():
+            if line.strip().startswith("|"):
+                routed.update(ROUTED_DOC_PATTERN.findall(line))
+        routed -= {"AGENTS.md"}
+        for doc in sorted(routed):
+            if not (root / doc).exists():
+                errors.append(f"AGENTS.md routes to missing doc: {doc}")
+        for doc in root_docs:
+            if doc in routed:
+                continue
+            # Word-boundary match so e.g. DEVICE_QA.md cannot satisfy QA.md.
+            if not re.search(rf"(?<![A-Za-z0-9_-]){re.escape(doc)}", agents_text):
                 warnings.append(f"AGENTS.md does not route to {doc}")
         for ref in sorted(set(DOC_ROUTE.findall(agents_text))):
             if not (root / ref).exists():

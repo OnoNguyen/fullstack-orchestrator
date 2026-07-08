@@ -17,6 +17,16 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_DIR = ROOT / "assets" / "project-adapter"
+RUNBOOK_TEMPLATE = ROOT / "assets" / "runbook" / "RUNBOOK.md.template"
+
+# Runbooks are emergent: proposed only when scan evidence shows the pattern,
+# and any new pattern name creates a fresh runbook from the generic template.
+RUNBOOK_TRIGGERS = {
+    "QA": "QA, qa, runtime evidence, browser/device/simulator checks",
+    "DEBUG": "debug, dbg, runtime attach loops",
+    "DEPLOY": "deploy, dpl, release, push, production verification",
+    "JOBS": "background jobs, workers, queues, cron runs",
+}
 SKIP_DIRS = {
     ".git",
     ".next",
@@ -334,6 +344,55 @@ def scanned_repo_paths(findings: list[RepoFinding]) -> set[Path]:
     return {finding.path.resolve() for finding in findings}
 
 
+def propose_runbooks(findings: list[RepoFinding]) -> dict[str, list[str]]:
+    proposals: dict[str, list[str]] = {}
+    for finding in findings:
+        if finding.verification:
+            proposals.setdefault("QA", []).extend(
+                f"{finding.alias}: {item}" for item in finding.verification[:4]
+            )
+        if finding.debug:
+            proposals.setdefault("DEBUG", []).extend(
+                f"{finding.alias}: {item}" for item in finding.debug[:4]
+            )
+        if finding.deploy:
+            proposals.setdefault("DEPLOY", []).extend(
+                f"{finding.alias}: {item}" for item in finding.deploy[:4]
+            )
+        if "worker" in finding.role:
+            proposals.setdefault("JOBS", []).append(
+                f"{finding.alias}: worker/job surfaces detected"
+            )
+    return {name: proposals[name] for name in RUNBOOK_TRIGGERS if name in proposals}
+
+
+def resolve_runbooks(selection: str, proposals: dict[str, list[str]]) -> dict[str, list[str]]:
+    if selection.strip().lower() in {"", "none"}:
+        return {}
+    reserved = {
+        template.name.removesuffix(".md.template").upper()
+        for template in TEMPLATE_DIR.glob("*.template")
+    }
+    runbooks: dict[str, list[str]] = {}
+    for raw in selection.split(","):
+        name = raw.strip().upper().removesuffix(".MD")
+        if not name:
+            continue
+        if name == "AUTO":
+            runbooks.update(proposals)
+            continue
+        if name == "NONE":
+            raise SystemExit("--runbooks 'none' cannot be combined with runbook names")
+        if not re.fullmatch(r"[A-Z][A-Z0-9_-]*", name):
+            raise SystemExit(
+                f"Invalid runbook name: {raw.strip()!r} (start with a letter; letters, digits, _ or -)"
+            )
+        if name in reserved:
+            raise SystemExit(f"Runbook name collides with core adapter doc: {name}.md")
+        runbooks[name] = proposals.get(name, [])
+    return runbooks
+
+
 def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     orchestration_path = suggested_orchestration_path(findings)
     worktree_root = suggested_worktree_root(findings)
@@ -401,6 +460,24 @@ def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("Use the repo evidence above to ask the user which end-to-end capabilities matter.")
     lines.append("For each accepted slice, capture intent, surfaces, dependencies, terms, BDD scenarios, gates, and merge order.")
     lines.append("")
+    lines.append("## Runbook Proposals")
+    lines.append("")
+    lines.append("Runbooks are emergent: one pattern-named doc per detected stack pattern, not a fixed set.")
+    proposals = propose_runbooks(findings)
+    if proposals:
+        for name, evidence in proposals.items():
+            lines.append("")
+            lines.append(f"### {name}.md")
+            lines.append("")
+            lines.extend(f"- {item}" for item in evidence[:6])
+    else:
+        lines.append("")
+        lines.append("- No runbook patterns detected in the scanned repos.")
+    lines.append("")
+    lines.append("`--write` creates the proposed runbooks by default (`--runbooks auto`).")
+    lines.append("Adjust with an explicit list (`--runbooks QA,DEPLOY`), skip with `--runbooks none`,")
+    lines.append("or add a new pattern by naming it (`--runbooks auto,MODEL_EVAL`).")
+    lines.append("")
     lines.append("## Review Checklist")
     lines.append("")
     lines.append("- Dedicated orchestration repo created or confirmed")
@@ -409,14 +486,14 @@ def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("- Repo map approved")
     lines.append("- Glossary terms approved")
     lines.append("- Vertical slices approved with BDD scenarios and acceptance gates")
-    lines.append("- QA/debug/deploy gates approved")
+    lines.append("- Runbook set and gates approved")
     lines.append("- Companion skill recommendations reviewed")
     lines.append("")
     lines.append("## Recommended Next Steps")
     lines.append("")
     lines.append("Option A — Create or confirm the dedicated orchestration repo")
     lines.append(f"- Use `{orchestration_path}` unless you already have a dedicated orchestration/docs repo.")
-    lines.append("- Write AGENTS.md, ORCHESTRATION.md, TASKS.md, WORKTREES.md, GLOSSARY.md, SLICES.md, QA.md, DEBUG.md, DEPLOY.md, DOCUMENTATION_POLICY.md, STATUS.md, and SKILL_FEEDBACK.md there.")
+    lines.append("- Write the core docs (AGENTS.md, ORCHESTRATION.md, TASKS.md, WORKTREES.md, GLOSSARY.md, SLICES.md, DOCUMENTATION_POLICY.md, STATUS.md, SKILL_FEEDBACK.md) plus the approved runbooks there.")
     lines.append(f"- Approve `{worktree_root}` or pass `--worktree-root` with the chosen task worktree root.")
     lines.append("- Keep scanned implementation repos as surfaces only.")
     lines.append("")
@@ -443,6 +520,16 @@ def repo_rows(findings: list[RepoFinding]) -> str:
     return "\n".join(rows)
 
 
+def runbook_trigger(name: str) -> str:
+    return RUNBOOK_TRIGGERS.get(name, f"{name.lower().replace('_', ' ')} tasks")
+
+
+def runbook_rows(runbooks: dict[str, list[str]]) -> str:
+    return "\n".join(
+        f"| {runbook_trigger(name)} | `{name}.md` |" for name in runbooks
+    )
+
+
 def write_docs(
     coordinator: Path,
     project_name: str,
@@ -451,6 +538,7 @@ def write_docs(
     worktree_root: str,
     task_branch_convention: str,
     landing_policy: str,
+    runbooks: dict[str, list[str]],
 ) -> list[Path]:
     written: list[Path] = []
     values = {
@@ -459,13 +547,31 @@ def write_docs(
         "worktree_root": worktree_root,
         "task_branch_convention": task_branch_convention,
         "landing_policy": landing_policy,
+        "runbook_rows": runbook_rows(runbooks),
     }
     targets = [
-        (template, coordinator / template.name.removesuffix(".template"))
+        (template, coordinator / template.name.removesuffix(".template"), values)
         for template in sorted(TEMPLATE_DIR.glob("*.template"))
     ]
+    for name, evidence in runbooks.items():
+        runbook_values = {
+            "project_name": project_name,
+            "runbook_name": name,
+            "runbook_trigger": runbook_trigger(name),
+            "runbook_evidence": "\n".join(f"- {item}" for item in evidence)
+            or "- (add evidence after review)",
+        }
+        targets.append((RUNBOOK_TEMPLATE, coordinator / f"{name}.md", runbook_values))
+    seen: dict[Path, str] = {}
+    for template, target, _values in targets:
+        if target in seen:
+            raise SystemExit(
+                f"Duplicate write target {target} (from {seen[target]} and {template.name}); "
+                "nothing was written"
+            )
+        seen[target] = template.name
     if not force:
-        conflicts = [target for _template, target in targets if target.exists()]
+        conflicts = [target for _template, target, _values in targets if target.exists()]
         if conflicts:
             listing = "\n".join(f"- {target}" for target in conflicts)
             raise SystemExit(
@@ -474,13 +580,14 @@ def write_docs(
                 "Review them first; rerun with --force only if overwriting all of them is intended."
             )
     renders = []
-    for template, target in targets:
+    for template, target, template_values in targets:
         try:
-            renders.append((target, template.read_text().format(**values)))
+            content = template.read_text().format(**template_values)
         except (KeyError, IndexError, ValueError) as error:
             raise SystemExit(
                 f"{template.name}: template render failed ({error!r}); nothing was written"
             )
+        renders.append((target, re.sub(r"\n{3,}", "\n\n", content)))
     coordinator.mkdir(parents=True, exist_ok=True)
     for target, content in renders:
         target.write_text(content)
@@ -500,6 +607,12 @@ def parse_args() -> argparse.Namespace:
         help="Approved task branch naming convention for generated WORKTREES.md",
     )
     parser.add_argument("--landing-policy", default="all-or-hold", help="Approved landing policy for generated WORKTREES.md")
+    parser.add_argument(
+        "--runbooks",
+        default="auto",
+        help="Runbooks to create with --write: 'auto' (evidence-proposed set), 'none', "
+        "or a comma list of names; unknown names create new pattern runbooks (e.g. auto,MODEL_EVAL)",
+    )
     parser.add_argument("--write", action="store_true", help="Write adapter docs after user review")
     parser.add_argument("--force", action="store_true", help="Overwrite existing adapter docs")
     parser.add_argument(
@@ -587,6 +700,7 @@ def main() -> int:
                 print(f"Warning: writing into scanned implementation repo by explicit override: {coordinator}")
         project_name = args.project_name or coordinator.name
         worktree_root = args.worktree_root or str(suggested_worktree_root(findings))
+        runbooks = resolve_runbooks(args.runbooks, propose_runbooks(findings))
         written = write_docs(
             coordinator,
             project_name,
@@ -595,6 +709,7 @@ def main() -> int:
             worktree_root,
             args.task_branch_convention,
             args.landing_policy,
+            runbooks,
         )
         print("")
         print("## Written Adapter Docs")

@@ -1,0 +1,23 @@
+# {project_name} {runbook_name} Runbook
+
+Trigger: {runbook_trigger}
+
+This runbook exists for a pattern this project shows or the user named. Keep
+it project-specific: exact commands, gates, and owners. Generic doctrine lives
+in the orchestrator skill references, not here.
+
+## Preconditions
+
+- TODO: state that must be true before running this runbook
+
+## Steps
+
+1. TODO: numbered, verifiable steps with exact commands
+
+## Evidence
+
+{runbook_evidence}
+
+## Rollback / Escape
+
+- TODO: how to stop, revert, or safely abandon a failed run
