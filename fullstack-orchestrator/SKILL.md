@@ -1,6 +1,6 @@
 ---
 name: fullstack-orchestrator
-description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, task boards, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices and their BDD acceptance scenarios, answering tasks/tsk task-board requests, grooming bloated orchestration docs on groom/grm, coordinating frontend/backend/infra work, setting up AGENTS.md routing, recording evidence-backed skill-feedback candidates, or deciding which companion skills to recommend.
+description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, task boards, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices and their BDD acceptance scenarios, answering tasks/tsk task-board requests, grooming bloated orchestration docs on groom/grm, updating the installed skill and reconciling project docs to the latest templates on update/upd, coordinating frontend/backend/infra work, setting up AGENTS.md routing, recording evidence-backed skill-feedback candidates, or deciding which companion skills to recommend.
 ---
 
 # Fullstack Orchestrator
@@ -99,8 +99,19 @@ Use scripts as evidence collectors and validators, not as authority:
 - When the user says `groom` or `grm`, audit the orchestration repo for doc
   bloat and produce a review-first groom report before editing any doc. See
   [grooming.md](references/grooming.md).
+- When the user gives `update` or `upd` as an explicit standalone command (or an
+  unambiguous phrase like "update the orchestrator skill"), run the review-first
+  update pipeline: pull the latest skill from its remote into every install root,
+  reconcile the current project's docs to the new templates (scaffolding and
+  policy only), then groom. This is a scoped skill directive, not a match on the
+  common verb: ordinary requests that merely contain "update" ("update the API
+  docs", "update dependencies", "update the board") are normal project edits and
+  must not enter this pipeline. If intent is ambiguous, ask before starting — this
+  path can mutate installed skill files. See [updating.md](references/updating.md).
 - Prefer temporary task branches/worktrees when the project adapter defines
-  them.
+  them; fetch and reconcile against the remote before basing task work — base on
+  the remote canonical branch when local is behind, and surface divergence
+  instead of silently starting from a stale or mismatched base.
 - For cross-repo changes, use all-or-hold landing: no repo lands until every
   affected surface rebases cleanly and passes its gates.
 - Use [worktrees-and-landing.md](references/worktrees-and-landing.md) when a
@@ -123,7 +134,9 @@ the skill's bundled validators, or confirm the updated skill still triggers
 on a representative prompt without executing side effects), and prefer a
 reviewed PR against the skill source when a remote exists. The candidate entry
 shape and rules live in the SKILL_FEEDBACK contract in
-[project-adapter.md](references/project-adapter.md).
+[project-adapter.md](references/project-adapter.md). The `update`/`upd` directive
+is the sanctioned path for pulling merged upstream improvements back into every
+installed copy; see [updating.md](references/updating.md).
 
 ## Companion Skills
 

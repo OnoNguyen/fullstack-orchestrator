@@ -412,7 +412,7 @@ def render_scan(findings: list[RepoFinding], skipped_urls: list[str]) -> str:
     lines.append("")
     lines.append(f"- Suggested task worktree root: {worktree_root}")
     lines.append("- Suggested task branch convention: `task/<short-slice>`.")
-    lines.append("- Treat canonical local branches as clean pickup points unless the project says otherwise.")
+    lines.append("- Fetch and reconcile against the remote before basing work: use `origin/<default>` when local is behind, surface divergence when local is ahead, fall back to local with a warning when offline (unless the project says otherwise).")
     lines.append("- Use task worktrees for cross-repo work, codegen, deploy-input changes, and runtime QA.")
     lines.append("- Default cross-repo landing: all-or-hold.")
     lines.append("")

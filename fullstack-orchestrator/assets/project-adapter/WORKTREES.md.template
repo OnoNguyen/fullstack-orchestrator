@@ -5,9 +5,12 @@ This file defines how mutable implementation work is isolated and landed.
 ## Canonical Pickup Points
 
 - Default canonical branch: the `Default branch` listed in `ORCHESTRATION.md`.
-- Canonical local branches are pickup points and should stay free of unrelated
-  uncommitted changes.
-- Verify live branch, dirty state, and ahead/behind state before editing.
+- Reconcile the canonical branch against its remote before basing work: fetch,
+  then base on `origin/<canonical>` when local is behind, surface the divergence
+  when local is ahead or diverged, and fall back to the local branch with a
+  warning when the remote is unreachable.
+- Keep canonical branches free of unrelated uncommitted changes.
+- Verify live branch and dirty state before editing.
 
 ## Task Worktree Root
 
@@ -32,9 +35,12 @@ Before mutating an implementation repo:
 
 1. Read the orchestration root navigator and triggered docs.
 2. Read that repo's local instructions.
-3. Inspect branch, dirty state, and ahead/behind state.
-4. Create or reuse the task checkout/worktree required by this policy.
-5. Preserve unrelated dirty files and user changes.
+3. Inspect branch and dirty state.
+4. Fetch the canonical remote and compare local against `origin/<canonical>`:
+   base on the remote when local is behind, surface the divergence when local is
+   ahead or diverged, fall back to local with a warning when offline.
+5. Create or reuse the task checkout/worktree on the chosen base.
+6. Preserve unrelated dirty files and user changes.
 
 ## Cross-Repo Landing
 
