@@ -100,7 +100,9 @@ Use scripts as evidence collectors and validators, not as authority:
   bloat and produce a review-first groom report before editing any doc. See
   [grooming.md](references/grooming.md).
 - Prefer temporary task branches/worktrees when the project adapter defines
-  them.
+  them; fetch and reconcile against the remote before basing task work — base on
+  the remote canonical branch when local is behind, and surface divergence
+  instead of silently starting from a stale or mismatched base.
 - For cross-repo changes, use all-or-hold landing: no repo lands until every
   affected surface rebases cleanly and passes its gates.
 - Use [worktrees-and-landing.md](references/worktrees-and-landing.md) when a
