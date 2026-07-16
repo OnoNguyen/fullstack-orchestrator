@@ -18,6 +18,40 @@ QA and deployment are separate requests. When QA is requested:
 Runtime QA should use the exact task commit when the project policy requires
 it. Do not treat a dev server being up as proof that the app or site works.
 
+### Simulator Pool And Memory Preflight
+
+Before any Apple simulator QA session creates, boots, or reuses a device:
+
+- inspect `xcrun simctl list devices -j`, memory pressure, swap activity,
+  simulator processes, task helpers, and relevant listening ports
+- treat available devices with a non-null `lastBootedAt` as the persistent
+  simulator pool; never-booted Xcode device definitions are not pool members
+- treat the default CoreSimulator device set as one host-wide pool shared by
+  all local orchestration repos, cap it at four devices, and reuse a compatible
+  inactive member before creating another device
+- count a simulator as owned only when a live external task process or recent
+  task terminal backs it; an app or system process running inside the simulator
+  is not ownership evidence
+- if compatibility requires a different device or runtime while the pool is
+  full, shut down and delete the least-recently booted inactive member, then
+  create its replacement; never delete an actively owned member
+- if preflight finds more than four pool members, use
+  `xcrun simctl delete <UDID>` on least-recently booted inactive members until
+  four remain; defer owned members to the normal wait rule
+- if all four members are owned, do not create a fifth device; recheck every
+  five minutes for up to 30 minutes, then report the owners and stop
+
+Parallel simulators are allowed only when `memory_pressure` reports at least
+25% free, `Pages throttled` is `0`, and swapouts are not rapidly increasing.
+If memory is blocked, prefer shutting down a clearly idle simulator and its
+stale task helpers. Recheck memory every 60 seconds for up to five minutes;
+then report the blocking processes and stop. Do not use `simctl shutdown all`
+or kill low-RSS CoreSimulator services while a live task owns a simulator.
+
+Simulator QA evidence must record the pool members and owners observed, reuse
+or LRU replacement performed, memory result, and any task that exhausted its
+wait budget.
+
 ## Debug
 
 Debug requests may use dirty state only when the project adapter allows it and
