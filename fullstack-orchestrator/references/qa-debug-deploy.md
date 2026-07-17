@@ -65,6 +65,34 @@ Before starting local runtimes:
 - prefer the current task checkout over canonical main
 - report how the runtime was attached and how success was proven
 
+## Local App Install
+
+A project-defined standalone `install` / `ins` command may authorize a local app
+install when the adapter routes that trigger to an install runbook. This lane is
+separate from debug, QA, deployment, distribution, and release.
+
+- Resolve the project, app variant, and target unambiguously before building.
+- Default to the latest committed local canonical branch. Include a task
+  checkout or dirty state only when the user explicitly selects it.
+- Build the project-defined durable, self-contained configuration. It must not
+  depend on a task-scoped development server or live development session.
+- Verify the expected name, installed identity, environment, integrity, and
+  target compatibility before installation.
+- Install with supported platform tooling, then read the exact installed
+  identity back from the target. Build success alone is not install success.
+- Do not launch the app unless requested. Installation can therefore complete
+  without the user opening or interacting with the target.
+- Never bypass platform security, trust, signing, provisioning, or management
+  controls. Report the exact one-time user action if the platform blocks an
+  unattended install.
+- Keep tracked preparation in the project-defined task worktree. Never commit
+  generated build products or tool caches.
+- Report whether the installed variant coexists with or replaces another app
+  identity, plus any expiry that limits how long it remains launchable.
+
+`install` never implies source publication, remote build execution, artifact
+distribution, deployment, or release.
+
 ## Deploy
 
 Deployment requires explicit user trigger: `deploy`, `dpl`, or a project-defined

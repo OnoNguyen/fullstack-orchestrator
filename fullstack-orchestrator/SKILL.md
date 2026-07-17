@@ -118,8 +118,14 @@ Use scripts as evidence collectors and validators, not as authority:
   task may dirty multiple repos, needs runtime QA, or involves landing/cleanup.
 - Do not deploy unless the user explicitly says `deploy`, `dpl`, or the
   project adapter defines an equivalent deploy trigger.
+- Treat a standalone `install` / `ins` command as local app-install authority
+  only when the project adapter defines an install runbook. It does not
+  authorize source publication, artifact distribution, deployment, or release.
+  Build the project-defined durable app variant, install it on the resolved
+  target, and read the installed identity back.
 - Use [qa-debug-deploy.md](references/qa-debug-deploy.md) when QA, debug,
-  runtime evidence, deploy, retry, or release state is involved.
+  runtime evidence, local app install, deploy, retry, or release state is
+  involved.
 
 ## Skill Improvement Loop
 
