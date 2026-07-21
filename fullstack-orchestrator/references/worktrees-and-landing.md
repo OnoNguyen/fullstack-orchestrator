@@ -69,7 +69,14 @@ Default landing policy is all-or-hold for cross-repo changes:
 2. Run required gates in every affected repo.
 3. Land repos in the order approved by `SLICES.md` or `WORKTREES.md`.
 4. Push only the intended payload repos.
-5. Remove merged task worktrees and stale task branches only after successful
+5. Read back the landed commits, then close the slice ledger in the
+   orchestration repo: set `Status: Landed`, record every affected repo under
+   `Landed at` as `repo@commit`, and replace pending values with durable
+   `Evidence` for every `BC-*` gate. Do not mark partially landed work as
+   `Landed`.
+6. Run `validate_project_adapter.py <orchestration-root> --strict --slice
+   "<slice name>"` and land the ledger update only when it passes.
+7. Remove merged task worktrees and stale task branches only after successful
    landing, unless the user asks to preserve them.
 
 Never discard unrelated work or delete an unmerged worktree without explicit

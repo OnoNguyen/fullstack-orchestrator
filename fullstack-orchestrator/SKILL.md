@@ -1,6 +1,6 @@
 ---
 name: fullstack-orchestrator
-description: Coordinates reviewed full-stack project work across one repo, a monorepo, or multiple repositories by scanning project topology, routing through lazy orchestration docs, and managing slices, task boards, QA, debug, deploy, landing, and handoff. Use when bootstrapping project orchestration, onboarding a codebase, scanning user-provided repos, planning vertical slices and their BDD acceptance scenarios, answering tasks/tsk task-board requests, grooming bloated orchestration docs on groom/grm, updating the installed skill and reconciling project docs to the latest templates on update/upd, coordinating frontend/backend/infra work, setting up AGENTS.md routing, recording evidence-backed skill-feedback candidates, or deciding which companion skills to recommend.
+description: Compose reviewed product behavior into domain-aligned vertical slices and acceptance gates, conduct full-stack delivery across one repo, a monorepo, or multiple repositories, and verify every gate with live evidence. Use when bootstrapping project orchestration; onboarding or scanning user-provided codebases; defining domain language, boundaries, slices, behavior contracts, or BDD acceptance scenarios; planning or implementing user-visible features; fixing bugs; changing cross-context or external contracts; coordinating frontend, backend, infrastructure, or companion-skill work; producing tasks/tsk boards; routing through AGENTS.md; managing worktrees, QA, debug, local install, deploy, landing, or handoff; grooming orchestration docs with groom/grm; reconciling the installed skill and project adapter with explicit update/upd; recording skill feedback; or recommending companion skills.
 ---
 
 # Fullstack Orchestrator
@@ -39,8 +39,8 @@ Core docs every project gets:
   landing, and cleanup.
 - `TASKS.md`: `tasks`/`tsk` board policy and action classification.
 - `GLOSSARY.md`: approved domain language and boundary terms.
-- `SLICES.md`: approved vertical slices, surfaces, dependencies, gates, and
-  merge order, with BDD acceptance scenarios for important behavior.
+- `SLICES.md`: approved vertical slices, surfaces, dependencies, behavior
+  contracts, gates, and merge order.
 - `DOCUMENTATION_POLICY.md`: canonical doc ownership, anti-duplication rules,
   doc size budgets, and grooming policy.
 - `STATUS.md`: coordinator-owned current state, not worker scratchpad.
@@ -56,30 +56,65 @@ a pattern gets no stub for it.
 See [project-adapter.md](references/project-adapter.md) for doc contracts,
 the runbook contract, and templates.
 
-## Domain Composer
+## Core Role
 
-Compose the project like music: each subdomain is a distinct instrument, each
-bounded context has a clear part, and implementation surfaces are arranged so
-the whole product plays coherently. Use domain-driven design language to name
-boundaries and handoffs in `GLOSSARY.md` and `SLICES.md`, subject to the
-Operating Rule: treat the domain model as navigation until verified against
-live state.
+Compose, Conduct, Verify.
 
-Prove the composition with behavior examples. For important user-visible or
-cross-context slice behavior, draft 1-3 business-readable
-`Given / When / Then` scenarios in chat, tie each to a verification gate
-(automated test, contract check, QA step, runtime evidence, or deploy smoke),
-and record them with the slice in `SLICES.md` once the user approves it. If a
-scenario contradicts the current model, propose the glossary, slice, or plan
-fix in chat and apply it once the user approves, before coding. The slice
-contract lives in [project-adapter.md](references/project-adapter.md).
+### Compose
+
+Define work as product behavior before dividing it by repository. Clarify
+domain terms, bounded contexts, ownership, and handoffs in `GLOSSARY.md` and
+`SLICES.md`. Express behavior as vertical slices with explicit acceptance
+gates. Treat the model as a routing hypothesis until live evidence confirms it.
+
+### Conduct
+
+Route each slice across the required implementation surfaces, agents, and
+companion skills. Make dependencies, owners, worktree policy, gates, and
+landing order explicit. Keep the slice, not a repository or specialist, as the
+unit of coordination.
+
+### Verify
+
+Name the evidence required for every gate before execution. Collect and report
+evidence for each gate before declaring completion. Use the project-approved
+proof that fits the risk: automated tests, contract checks, runtime QA, observed
+logs or metrics, deploy smoke, or another observable result. Report unverified
+gates and blockers instead of inferring success.
+
+### Behavior Contract
+
+Apply this contract to every user-visible feature or behavior change, bug fix,
+and cross-context or external contract change:
+
+1. Find the approved slice and its behavior contracts. If none covers the
+   change, draft 1-3 business-readable `Given / When / Then` scenarios in chat
+   before coding and give each a stable `BC-*` ID.
+2. Map each scenario to a named verification gate and state the evidence that
+   will prove it.
+3. Resolve contradictions between the scenario, glossary, slice, plan, and
+   live system before coding. Write approved model changes to `GLOSSARY.md` or
+   `SLICES.md`; do not write unapproved findings as canonical facts.
+4. Implement against the scenarios, run every applicable gate, and report the
+   evidence for each gate.
+5. Do not declare the behavior complete while a required gate lacks evidence;
+   report the gap or blocker.
+
+Do not pause merely to approve wording when the user's requested behavior is
+clear; use the draft as the working contract and ask only when it exposes a
+material product decision. Exempt a task only when it has no intended or
+plausible user-visible, cross-context, or external contract effect. State the
+reason for the exemption and still run the applicable non-behavior gates. Never
+exempt a bug fix merely because it is small. The canonical contract lives in
+[project-adapter.md](references/project-adapter.md).
 
 ## Onboarding Discipline
 
 Scan only user-provided local paths or URLs. Keep unreviewed findings in chat,
 not canonical docs. Ask the user to create or confirm a dedicated orchestration
 repo, then approve findings section by section before writing docs: repo map,
-worktree policy, task-board policy, glossary, slices, runbook proposals.
+worktree policy, task-board policy, glossary, slices and behavior contracts,
+runbook proposals.
 
 Use scripts as evidence collectors and validators, not as authority:
 
@@ -92,10 +127,16 @@ Use scripts as evidence collectors and validators, not as authority:
 
 ## Work Execution
 
+- Before implementation, classify the task as behavior-contract required or
+  exempt. For required work, load the relevant `GLOSSARY.md` and `SLICES.md`,
+  then reuse or draft the contract before editing implementation surfaces. If
+  the adapter validator is available, run it with `--strict --slice "<name>"`
+  before coding so unrelated landed slices cannot mask a proposed target.
 - Work slice first, repo second: repos are implementation surfaces, not the
   product slice itself.
 - When the user says `tasks` or `tsk`, load `TASKS.md` and produce an
-  actionable-only board before recommending continuations.
+  actionable-only board before recommending continuations. Surface behavior
+  work with no approved contract as `Needs behavior contract`.
 - When the user says `groom` or `grm`, audit the orchestration repo for doc
   bloat and produce a review-first groom report before editing any doc. See
   [grooming.md](references/grooming.md).
@@ -113,7 +154,10 @@ Use scripts as evidence collectors and validators, not as authority:
   the remote canonical branch when local is behind, and surface divergence
   instead of silently starting from a stale or mismatched base.
 - For cross-repo changes, use all-or-hold landing: no repo lands until every
-  affected surface rebases cleanly and passes its gates.
+  affected surface rebases cleanly and every behavior gate has evidence.
+- After successful landing, close the `SLICES.md` ledger: set `Status: Landed`,
+  record `Landed at` repo commits and durable `Evidence` for every `BC-*`, then
+  rerun targeted strict validation before reporting completion.
 - Use [worktrees-and-landing.md](references/worktrees-and-landing.md) when a
   task may dirty multiple repos, needs runtime QA, or involves landing/cleanup.
 - Do not deploy unless the user explicitly says `deploy`, `dpl`, or the
@@ -153,3 +197,7 @@ first, then a project-supplied manifest, and search public catalogs only when
 the user asks for install suggestions. Never install without approval; record
 gaps no live source can fill as `SKILL_FEEDBACK.md` candidates. See
 [companion-skills.md](references/companion-skills.md).
+
+Keep the behavior contract coordinator-owned when delegating test mechanics to
+a TDD, QA, or specialist companion skill. The companion proves a gate; it does
+not redefine the promised behavior silently.

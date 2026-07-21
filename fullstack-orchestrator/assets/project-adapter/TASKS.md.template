@@ -12,7 +12,8 @@ orientation surface, not a second issue tracker.
 Check the smallest live source set needed:
 
 - `STATUS.md` for current pending work and blockers
-- `SLICES.md` for approved slice names, surfaces, gates, and landing order
+- `SLICES.md` for approved slice names, behavior contracts, gates, and landing
+  order
 - `WORKTREES.md` for task branch/worktree policy
 - `ORCHESTRATION.md` for repo aliases and local paths
 - active threads, task worktrees, branches, and dirty state when available
@@ -23,8 +24,9 @@ docs.
 
 ## Board Rules
 
-- Include only actionable rows: ready work, blocked work, work needing QA, work
-  needing landing, or work that appears abandoned.
+- Include only actionable rows: work needing a behavior contract, ready work,
+  blocked work, work needing QA, work needing landing, or work that appears
+  abandoned.
 - Omit completed history unless live residue still needs a decision.
 - Verify actual repo, branch/worktree, and git state before ranking a row.
 - Treat cleanup and abort candidates as recommendation-only.
@@ -35,6 +37,7 @@ docs.
 
 Use these statuses:
 
+- `Needs behavior contract`
 - `Ready to continue`
 - `Needs QA`
 - `Needs landing`
@@ -49,7 +52,8 @@ Use these columns:
 | --- | --- | --- | --- | --- | --- | --- |
 
 Rank impact first: production or launch blockers, broken user-visible behavior,
-deploy risk, and active high-priority work outrank routine cleanup.
+missing contracts for imminent behavior work, deploy risk, and active
+high-priority work outrank routine cleanup.
 
 ## Action Boundary
 

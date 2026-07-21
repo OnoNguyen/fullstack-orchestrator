@@ -48,6 +48,40 @@ DEFAULT_BUDGETS = {
 BUDGET_ROW = re.compile(r"^\|\s*`?([A-Z_]+\.md)`?\s*\|\s*(\d+)\s*\|", re.MULTILINE)
 DOC_ROUTE = re.compile(r"`([A-Za-z0-9_./-]+\.md)`")
 ROUTED_DOC_PATTERN = re.compile(r"`([A-Za-z0-9][A-Za-z0-9_.-]*\.md)`")
+SLICE_HEADING = re.compile(
+    r"^ {0,3}##[ \t]+(?!#)(?P<title>\S.*?)[ \t]*$", re.MULTILINE
+)
+CONTRACT_HEADING = re.compile(
+    r"^ {0,3}###[ \t]+(?P<id>BC-[A-Z0-9]+(?:-[A-Z0-9]+)*)[ \t]+(?:—|-)[ \t]+(?P<title>\S.*?)[ \t]*$",
+    re.MULTILINE,
+)
+H3_HEADING = re.compile(r"^ {0,3}###[ \t]+(?!#)\S.*?[ \t]*$", re.MULTILINE)
+FENCE_START = re.compile(r"^ {0,3}(?P<fence>`{3,}|~{3,})")
+SLICE_STATUS = re.compile(
+    r"^- Status:[ \t]*(?P<value>[^\r\n]*?)[ \t]*$", re.MULTILINE
+)
+CONTRACT_FIELDS = ("Given", "When", "Then", "Gate", "Evidence")
+PLACEHOLDER_VALUE = re.compile(
+    r"^(?:<.*>|TODO(?:\b.*)?|TBD(?:\b.*)?|Pending|N/?A|None|Placeholder|"
+    r"Example|\?|\-|\.\.\.)$",
+    re.IGNORECASE,
+)
+PLACEHOLDER_CONTRACT_IDS = {"BC-000", "BC-EXAMPLE", "BC-TBD", "BC-TODO", "BC-XXX"}
+LANDING_REFS = re.compile(
+    r"^[A-Za-z0-9_.-]+@[0-9A-Fa-f]{7,64}"
+    r"(?:,[ \t]*[A-Za-z0-9_.-]+@[0-9A-Fa-f]{7,64})*$"
+)
+EVIDENCE_VALUE = re.compile(
+    r"^(?:test|contract|qa|runtime|smoke):[ \t]+(?P<locator>\S.*?)[ \t]+\|[ \t]+"
+    r"(?P<outcome>passed|passing|success|successful|verified|succeeded|observed|"
+    r"approved|green|confirmed|complete|completed|healthy|ok|accepted)$",
+    re.IGNORECASE,
+)
+DURABLE_EVIDENCE_LOCATOR = re.compile(
+    r"(?:https?://\S+|[A-Za-z0-9_.-]+@[0-9A-Fa-f]{7,64}\b|"
+    r"(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.[A-Za-z0-9]{1,12}(?:#\S+|::\S+)?)",
+    re.IGNORECASE,
+)
 
 
 def read(path: Path) -> str:
@@ -64,7 +98,218 @@ def load_budgets(root: Path) -> dict[str, int]:
     return budgets
 
 
-def validate(root: Path, strict: bool) -> tuple[list[str], list[str]]:
+def is_missing_value(value: str) -> bool:
+    value = value.strip()
+    return not value or bool(PLACEHOLDER_VALUE.fullmatch(value))
+
+
+def is_durable_evidence(value: str) -> bool:
+    match = EVIDENCE_VALUE.fullmatch(value.strip())
+    return bool(match and DURABLE_EVIDENCE_LOCATOR.search(match.group("locator")))
+
+
+def strip_nonrendered_blocks(content: str) -> str:
+    output: list[str] = []
+    active_character = ""
+    active_length = 0
+    in_comment = False
+    for line in content.splitlines(keepends=True):
+        line_ending = ""
+        if line.endswith("\r\n"):
+            line_ending = "\r\n"
+        elif line.endswith(("\n", "\r")):
+            line_ending = line[-1]
+        visible = line[: -len(line_ending)] if line_ending else line
+
+        if active_character:
+            closing_fence = re.fullmatch(
+                rf" {{0,3}}{re.escape(active_character)}{{{active_length},}}[ \t]*",
+                visible,
+            )
+            if closing_fence:
+                active_character = ""
+                active_length = 0
+            output.append(line_ending)
+            continue
+
+        if in_comment:
+            comment_end = visible.find("-->")
+            if comment_end < 0:
+                output.append(line_ending)
+                continue
+            in_comment = False
+            output.append(line_ending)
+            continue
+
+        match = FENCE_START.match(visible)
+        if match:
+            fence = match.group("fence")
+            active_character = fence[0]
+            active_length = len(fence)
+            output.append(line_ending)
+            continue
+
+        search_from = 0
+        while True:
+            comment_start = visible.find("<!--", search_from)
+            if comment_start < 0:
+                break
+            comment_end = visible.find("-->", comment_start + 4)
+            if comment_end < 0:
+                visible = visible[:comment_start] + " " * (len(visible) - comment_start)
+                in_comment = True
+                break
+            end = comment_end + 3
+            visible = visible[:comment_start] + " " * (end - comment_start) + visible[end:]
+            search_from = end
+
+        output.append(visible + line_ending)
+    return "".join(output)
+
+
+def behavior_contract_sections(content: str) -> list[tuple[str, str]]:
+    headings = list(SLICE_HEADING.finditer(content))
+    sections: list[tuple[str, str]] = []
+    for index, heading in enumerate(headings):
+        title = heading.group("title").strip()
+        if normalize_heading(title) == "slices to confirm":
+            continue
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(content)
+        sections.append((title, content[heading.end() : end]))
+    return sections
+
+
+def normalize_heading(value: str) -> str:
+    value = re.sub(r"[ \t]+#+[ \t]*$", "", value.strip())
+    return " ".join(value.split()).casefold()
+
+
+def validate_behavior_contracts(
+    content: str, strict: bool, target_slice: str | None = None
+) -> tuple[list[str], list[str]]:
+    content = strip_nonrendered_blocks(content)
+    errors: list[str] = []
+    warnings: list[str] = []
+    readiness_findings = errors if strict else warnings
+    seen_contract_ids: set[str] = set()
+    ready_contract_count = 0
+    target_key = normalize_heading(target_slice) if target_slice else None
+    target_matches = 0
+    target_ready = False
+
+    sections = behavior_contract_sections(content)
+    for slice_title, section in sections:
+        is_target = target_key is not None and normalize_heading(slice_title) == target_key
+        if is_target:
+            target_matches += 1
+        statuses = [match.group("value").strip() for match in SLICE_STATUS.finditer(section)]
+        if not statuses:
+            readiness_findings.append(
+                f"SLICES.md slice {slice_title!r} has legacy structure without Status; "
+                "behavior contract validation skipped"
+            )
+            continue
+        if len(statuses) > 1:
+            errors.append(f"SLICES.md slice {slice_title!r} has duplicate Status fields")
+            continue
+
+        status = statuses[0].casefold()
+        if status not in {"proposed", "approved", "landed"}:
+            errors.append(
+                f"SLICES.md slice {slice_title!r} has invalid Status: {statuses[0]!r}"
+            )
+            continue
+
+        contract_headings = list(CONTRACT_HEADING.finditer(section))
+        h3_starts = [heading.start() for heading in H3_HEADING.finditer(section)]
+        for heading in contract_headings:
+            contract_id = heading.group("id")
+            if contract_id in PLACEHOLDER_CONTRACT_IDS:
+                errors.append(
+                    f"SLICES.md behavior contract ID is a placeholder: {contract_id}"
+                )
+            if contract_id in seen_contract_ids:
+                errors.append(f"SLICES.md has duplicate behavior contract ID: {contract_id}")
+            seen_contract_ids.add(contract_id)
+
+        if status == "proposed":
+            continue
+
+        contract_count = len(contract_headings)
+        ready_contract_count += contract_count
+        if is_target and contract_count > 0:
+            target_ready = True
+        if not 1 <= contract_count <= 3:
+            errors.append(
+                f"SLICES.md slice {slice_title!r} must contain 1-3 behavior contracts; "
+                f"found {contract_count}"
+            )
+
+        if status == "landed":
+            landed_at = re.findall(
+                r"^- Landed at:[ \t]*([^\r\n]*?)[ \t]*$", section, re.MULTILINE
+            )
+            if len(landed_at) != 1 or not LANDING_REFS.fullmatch(landed_at[0]):
+                errors.append(
+                    f"SLICES.md landed slice {slice_title!r} requires Landed at as repo@commit references"
+                )
+
+        for heading in contract_headings:
+            contract_id = heading.group("id")
+            end = next(
+                (start for start in h3_starts if start > heading.start()), len(section)
+            )
+            contract = section[heading.end() : end]
+            required_fields = (
+                ("Given", "When", "Then", "Gate")
+                if status == "approved"
+                else ("Then", "Gate", "Evidence")
+            )
+            for field in CONTRACT_FIELDS:
+                values = re.findall(
+                    rf"^- {re.escape(field)}:[ \t]*([^\r\n]*?)[ \t]*$",
+                    contract,
+                    re.MULTILINE,
+                )
+                if field in required_fields and not values:
+                    errors.append(f"SLICES.md {contract_id} missing {field} clause")
+                    continue
+                if len(values) > 1:
+                    errors.append(f"SLICES.md {contract_id} has duplicate {field} clauses")
+                    continue
+                if field in required_fields and values and is_missing_value(values[0]):
+                    errors.append(f"SLICES.md {contract_id} has blank {field} clause")
+                    continue
+                if (
+                    field == "Evidence"
+                    and field in required_fields
+                    and values
+                    and not is_durable_evidence(values[0])
+                ):
+                    errors.append(
+                        f"SLICES.md {contract_id} Evidence requires '<gate kind>: <durable locator> | <successful outcome>'"
+                    )
+
+    if target_key is not None:
+        if target_matches == 0:
+            errors.append(f"SLICES.md target slice not found: {target_slice!r}")
+        elif target_matches > 1:
+            errors.append(f"SLICES.md target slice is ambiguous: {target_slice!r}")
+        elif not target_ready:
+            errors.append(
+                f"SLICES.md target slice {target_slice!r} has no approved behavior contract"
+            )
+    elif ready_contract_count == 0:
+        readiness_findings.append(
+            "SLICES.md has no approved behavior contract; approve at least one before behavior implementation"
+        )
+
+    return errors, warnings
+
+
+def validate(
+    root: Path, strict: bool, target_slice: str | None = None
+) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
 
@@ -155,8 +400,15 @@ def validate(root: Path, strict: bool) -> tuple[list[str], list[str]]:
         warnings.append("GLOSSARY.md has no term sections yet")
 
     slices = root / "SLICES.md"
-    if slices.exists() and read(slices).count("\n## ") < 1:
-        warnings.append("SLICES.md has no slice sections yet")
+    if slices.exists():
+        slices_text = read(slices)
+        if slices_text.count("\n## ") < 1:
+            warnings.append("SLICES.md has no slice sections yet")
+        behavior_errors, behavior_warnings = validate_behavior_contracts(
+            slices_text, strict, target_slice
+        )
+        errors.extend(behavior_errors)
+        warnings.extend(behavior_warnings)
 
     policy = root / "DOCUMENTATION_POLICY.md"
     if policy.exists() and "Grooming" not in read(policy):
@@ -177,11 +429,20 @@ def total_lines(root: Path) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", nargs="?", default=".", help="Coordinator directory")
-    parser.add_argument("--strict", action="store_true", help="Treat line-count warnings as errors")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Treat budget and behavior-readiness warnings as errors",
+    )
+    parser.add_argument(
+        "--slice",
+        dest="target_slice",
+        help="Require the named slice to have an approved behavior contract",
+    )
     args = parser.parse_args()
 
     root = Path(args.root).expanduser().resolve()
-    errors, warnings = validate(root, args.strict)
+    errors, warnings = validate(root, args.strict, args.target_slice)
     print(f"Adapter: {root}")
     print(f"Total adapter lines (top-level docs, excluding archive/): {total_lines(root)}")
     if warnings:

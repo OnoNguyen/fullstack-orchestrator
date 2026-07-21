@@ -2,13 +2,16 @@
 
 [![skills.sh](https://skills.sh/b/OnoNguyen/fullstack-orchestrator)](https://skills.sh/OnoNguyen/fullstack-orchestrator)
 
-An Agent Skill for reviewed full-stack project orchestration across one repo, a
-monorepo, or multiple repositories.
+An Agent Skill that composes product behavior, conducts full-stack delivery
+across one repo, a monorepo, or multiple repositories, and verifies every gate
+with live evidence.
 
 The skill runs a project scan, bootstraps a small project adapter in a dedicated
 orchestration repo, keeps `AGENTS.md` as a lazy root navigator, records approved
 repo topology and domain language, proposes vertical slices from evidence, and
-coordinates task boards, QA, debug, deploy, landing, and handoff. Over time,
+turns user-visible features, bug fixes, and cross-context changes into behavior
+contracts before coordinating task boards, QA, debug, deploy, landing, and
+handoff. Over time,
 `groom`/`grm` audits the orchestration repo against per-doc size budgets so the
 docs stay a lean lazy-loading tree instead of a precontext tax.
 
@@ -28,8 +31,8 @@ a dedicated orchestration repo. Implementation repos stay as surfaces only:
 - `TASKS.md`: `tasks`/`tsk` board policy and action boundaries
 - `WORKTREES.md`: task branches/worktrees, pickup points, landing, cleanup
 - `GLOSSARY.md`: canonical domain language
-- `SLICES.md`: vertical slices, surfaces, BDD acceptance scenarios, gates,
-  merge order
+- `SLICES.md`: vertical slices, stable behavior contracts, gates, and merge
+  order
 - `DOCUMENTATION_POLICY.md`: doc ownership, size budgets, grooming policy
 - `STATUS.md`: current state
 - `SKILL_FEEDBACK.md`: reviewed skill-improvement candidates (skills never
@@ -62,6 +65,10 @@ Validate the adapter:
 ```bash
 python3 fullstack-orchestrator/scripts/validate_project_adapter.py /path/to/orchestration
 ```
+
+Use `--strict --slice "<slice name>"` before implementation or landing to
+require that specific slice to have an approved or landed behavior contract and
+enforce complete scenario clauses.
 
 Detect companion-skill categories (names resolve live against installed
 skills and optional project manifests — no bundled inventory):

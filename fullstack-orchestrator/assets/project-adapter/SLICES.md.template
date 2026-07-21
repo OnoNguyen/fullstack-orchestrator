@@ -1,23 +1,33 @@
 # {project_name} Slices
 
 Vertical slices are useful cuts through project behavior. Define slices by
-intent first, then behavior examples and implementation surfaces.
+intent first, then behavior contracts and implementation surfaces.
 
 ## Slices To Confirm
 
-Use this shape for each approved slice:
+Use this shape for each slice. Keep `Status` as `Proposed` until the behavior
+contract is approved. `Approved` authorizes implementation; `Landed` records
+verified completion.
 
 ## Example Slice
 
-- Intent:
-- Implementation surfaces:
-- Depends on:
-- Domain terms:
-- BDD scenarios (1-3, each mapped to a verification gate):
-  - Given:
-  - When:
-  - Then:
-  - Gate:
-- Data/privacy/security boundary:
-- Verification:
-- Merge status/order:
+- Status: Proposed
+- Intent: <user or business outcome>
+- Implementation surfaces: <repos or components>
+- Depends on: <slice IDs or none>
+- Domain terms: <terms from GLOSSARY.md>
+- Data/privacy/security boundary: <boundary or none>
+- Merge order: <surface order>
+
+### BC-001 — <observable behavior>
+
+- Given: <initial state>
+- When: <action or event>
+- Then: <observable outcome>
+- Gate: <named test, contract check, QA step, runtime evidence, or smoke>
+- Evidence: <test|contract|qa|runtime|smoke>: <durable locator> | <successful outcome; required when Landed>
+
+Use 1-3 stable, unique `BC-*` IDs per approved slice. Never renumber or reuse an
+ID. After landing, add `- Landed at: <repo@commit references>` and retain each
+ID, its observable `Then`, `Gate`, and `Evidence` even if other detail is
+groomed.

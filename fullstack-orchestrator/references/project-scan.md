@@ -50,8 +50,8 @@ Report sections in this order:
 3. task-board command policy
 4. repo map
 5. glossary candidates and term conflicts
-6. vertical slice candidates, with BDD acceptance scenarios for the
-   important behavior in each accepted slice
+6. vertical slice candidates, with behavior contracts and named gates for each
+   accepted user-visible, bug-fix, or cross-context behavior
 7. runbook proposals from detected stack patterns, with QA/debug/deploy gates
 8. companion skill categories (names resolve live; see
    [companion-skills.md](companion-skills.md))
@@ -70,6 +70,7 @@ When writing docs after approval:
 - approve whether `tasks`/`tsk` should use thread tools, local git/worktrees, or
   both when producing its task board
 - write only approved facts
+- keep slices `Proposed` until their behavior contracts are approved
 - keep `AGENTS.md` as a router
 - avoid `reviewed: false` markers in canonical docs
 - preserve existing project docs unless the user approves replacement

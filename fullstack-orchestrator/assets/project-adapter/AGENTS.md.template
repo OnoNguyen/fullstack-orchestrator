@@ -11,7 +11,8 @@ only the deeper docs triggered by the current task.
 | tasks, tsk, task board, continue/abort candidates | `TASKS.md` |
 | task branches, worktrees, landing, cleanup | `WORKTREES.md` |
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
-| slice planning, BDD scenarios, gates, dependencies, merge order | `SLICES.md` |
+| feature implementation, behavior change, bug fix, cross-context or external contract | `GLOSSARY.md`, `SLICES.md` |
+| slice planning, behavior contracts, BDD, gates, dependencies, merge order | `SLICES.md` |
 | current pending state, blockers, landing, deploy state | `STATUS.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
 | groom, grm, doc bloat, size budgets | `DOCUMENTATION_POLICY.md` |

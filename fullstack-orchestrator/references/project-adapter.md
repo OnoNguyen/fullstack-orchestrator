@@ -21,7 +21,7 @@ stubs.
 
 It must contain:
 
-- one sentence describing the coordinator role
+- one sentence describing the orchestrator role
 - a trigger table mapping task signals to deeper docs
 - default discipline: verify live repo state before mutation, read only
   triggered docs, do not preload everything
@@ -42,7 +42,8 @@ Recommended trigger rows:
 | tasks, tsk, task board, continue/abort candidates | `TASKS.md` |
 | task branches, worktrees, landing, cleanup | `WORKTREES.md` |
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
-| slice planning, BDD scenarios, gates, dependencies, merge order | `SLICES.md` |
+| feature implementation, behavior change, bug fix, cross-context or external contract | `GLOSSARY.md`, `SLICES.md` |
+| slice planning, behavior contracts, BDD, gates, dependencies, merge order | `SLICES.md` |
 | current pending state, blockers, landing, deploy state | `STATUS.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
 | groom, grm, doc bloat, size budgets | `DOCUMENTATION_POLICY.md` |
@@ -82,7 +83,7 @@ Record the approved `tasks`/`tsk` command behavior:
 - task-board sources such as `STATUS.md`, `SLICES.md`, `WORKTREES.md`, threads,
   worktrees, and branch state
 - actionable-only inclusion rules
-- row status labels
+- row status labels, including `Needs behavior contract`
 - board columns
 - ranking policy
 - action boundary for cleanup, aborts, thread archiving, and status updates
@@ -109,15 +110,31 @@ read as input, but this adapter writes `GLOSSARY.md`.
 Vertical slices describe user/business capability, not repo ownership. Each
 slice should include:
 
+- lifecycle status: `Proposed`, `Approved`, or `Landed`
 - intent
 - implementation surfaces
 - dependencies
 - relevant glossary terms
-- 1-3 `Given / When / Then` BDD acceptance scenarios for important behavior,
-  each mapped to a verification gate
+- 1-3 behavior contracts for every approved user-visible feature, bug fix, or
+  cross-context or external contract change
+- a stable, unique `BC-*` ID plus `Given / When / Then / Gate` for each
+  behavior contract
+- durable `Evidence` for every landed behavior contract
 - data/privacy/security boundary when relevant
-- verification gates
 - merge or landing order
+
+Keep a slice `Proposed` while its behavior is being discovered. `Approved`
+authorizes implementation and requires complete contracts. `Landed` requires
+durable `repo@commit` references. Grooming a landed slice may remove detailed
+setup, but must retain every stable behavior-contract ID, its observable
+`Then`, named `Gate`, and durable `Evidence`. Never renumber or reuse an ID.
+Format evidence as `test|contract|qa|runtime|smoke: <durable locator> |
+<successful outcome>` using a commit reference, URL, test selector, runbook
+anchor, or artifact path. Use an unambiguously successful terminal outcome such
+as `passed`, `verified`, `observed`, `successful`, or `healthy`.
+Before implementing or landing a known slice, run the adapter validator with
+`--strict --slice "<slice name>"`; global readiness alone can be satisfied by
+an unrelated approved or landed slice.
 
 ## STATUS.md
 
@@ -182,7 +199,7 @@ Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
 - glossary terms live in `GLOSSARY.md`
 - topology lives in `ORCHESTRATION.md`
 - task-board command policy lives in `TASKS.md`
-- slices, BDD scenarios, and gates live in `SLICES.md`
+- slices, behavior contracts, and gates live in `SLICES.md`
 - runbooks live in their pattern-named docs, one canonical runbook per pattern
 - evidence-backed skill-improvement candidates live in `SKILL_FEEDBACK.md`
 - implementation specs, schemas, migrations, and code-level docs live in the
@@ -191,7 +208,8 @@ Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
 It also owns the grooming policy for the `groom`/`grm` trigger:
 
 - a Size Budgets table with soft per-doc line budgets, enforced as validator
-  warnings (errors with `--strict`)
+  warnings (errors with `--strict`); missing approved or landed behavior
+  contracts also warn and become errors with `--strict`
 - report-first grooming: propose findings in chat, apply only approved moves
 - archive over delete: stale content moves to `archive/` under date-stamped
   names; `AGENTS.md` must never route into `archive/`

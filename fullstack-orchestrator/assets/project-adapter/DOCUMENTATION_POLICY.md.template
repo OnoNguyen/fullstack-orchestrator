@@ -5,7 +5,7 @@
 - Repo topology lives in `ORCHESTRATION.md`.
 - Task-board command policy lives in `TASKS.md`.
 - Domain language lives in `GLOSSARY.md`.
-- Slice mapping, BDD scenarios, and gates live in `SLICES.md`.
+- Slice mapping, behavior contracts, and gates live in `SLICES.md`.
 - Runbooks live in their pattern-named docs, one canonical runbook per
   pattern, each routed from `AGENTS.md`.
 - Current state lives in `STATUS.md`.
@@ -52,3 +52,5 @@ When the user says `groom` or `grm`:
 - Never route `archive/` from `AGENTS.md`; archived content stays out of the
   precontext path.
 - Verify against live repo state before pruning topology or slice entries.
+- Preserve stable behavior-contract IDs, observable outcomes, and gate evidence
+  when compacting landed slices.

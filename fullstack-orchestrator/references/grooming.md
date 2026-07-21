@@ -55,7 +55,7 @@ the adapter a lazy-loading tree of small, single-owner docs.
 | `AGENTS.md` | runbook steps or policy prose creep into the router | demote to the owning leaf doc; keep rows one line |
 | `STATUS.md` | history log accretes | trim to current state; archive the rest |
 | `TASKS.md` | becomes a backlog of stored tasks | keep command policy only; tasks live in live state |
-| `SLICES.md` | landed slices keep full specs | compress landed slices to a one-line ledger entry with the landing commit |
+| `SLICES.md` | landed slices keep full setup detail | compact each landed slice while preserving its stable behavior-contract IDs, observable outcomes, gate evidence, and landing commits |
 | `GLOSSARY.md` | implementation detail creeps in | move detail to the implementation repo |
 | `QA.md`, `DEBUG.md`, `DEPLOY.md` | one-off incident notes accumulate | keep repeatable steps; archive incident notes |
 | `ORCHESTRATION.md` | dead repos, renamed branches | verify live state, then prune |
@@ -67,3 +67,5 @@ the adapter a lazy-loading tree of small, single-owner docs.
 - No writes before the user approves the report or specific rows.
 - Friction caused by this skill itself becomes a `SKILL_FEEDBACK.md`
   candidate, not an inline skill edit.
+- Never groom away stable behavior-contract IDs or the gate evidence that
+  preserves traceability from promised behavior to verification.
