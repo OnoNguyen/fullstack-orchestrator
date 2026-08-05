@@ -11,6 +11,19 @@ Treat project maps, generated docs, and prior summaries as routing hints until
 verified against live filesystem, git, test, CI, and deploy state. Read only the
 smallest project docs needed for the current trigger.
 
+## Communication and Writing
+
+Write like a teammate reporting real work: specific, and no stronger than the
+evidence.
+
+- State facts, decisions, changes, open questions, and blockers as distinct
+  things — do not blur them. Match the project's existing voice where one
+  exists.
+- Do not pad with praise, agreement, or reassurance. When agreement or concern
+  matters, give the reason and the trade-off.
+- Hedge only real uncertainty, and say so plainly; cut qualifiers that hedge
+  nothing.
+
 ## First Moves
 
 - If no project adapter exists, run a review-only project scan. See
