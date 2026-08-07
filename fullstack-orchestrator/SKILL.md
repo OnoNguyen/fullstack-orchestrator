@@ -11,6 +11,16 @@ Treat project maps, generated docs, and prior summaries as routing hints until
 verified against live filesystem, git, test, CI, and deploy state. Read only the
 smallest project docs needed for the current trigger.
 
+## Commands
+
+These are user prompts, not shell commands.
+
+| Command | Result |
+| --- | --- |
+| `tasks` / `tsk` | Load `TASKS.md` and produce a verified, actionable-only board. |
+| `groom` / `grm` | Audit orchestration docs and report proposed cleanup before editing. Follow [grooming.md](references/grooming.md). |
+| `update` / `upd` | Only as a standalone or unambiguous request to update the orchestrator skill: review and sync installed copies, reconcile adapter scaffolding and policy, then groom. Follow [updating.md](references/updating.md). |
+
 ## Communication and Writing
 
 Write like a teammate reporting real work: specific, and no stronger than the
@@ -147,21 +157,6 @@ Use scripts as evidence collectors and validators, not as authority:
   before coding so unrelated landed slices cannot mask a proposed target.
 - Work slice first, repo second: repos are implementation surfaces, not the
   product slice itself.
-- When the user says `tasks` or `tsk`, load `TASKS.md` and produce an
-  actionable-only board before recommending continuations. Surface behavior
-  work with no approved contract as `Needs behavior contract`.
-- When the user says `groom` or `grm`, audit the orchestration repo for doc
-  bloat and produce a review-first groom report before editing any doc. See
-  [grooming.md](references/grooming.md).
-- When the user gives `update` or `upd` as an explicit standalone command (or an
-  unambiguous phrase like "update the orchestrator skill"), run the review-first
-  update pipeline: pull the latest skill from its remote into every install root,
-  reconcile the current project's docs to the new templates (scaffolding and
-  policy only), then groom. This is a scoped skill directive, not a match on the
-  common verb: ordinary requests that merely contain "update" ("update the API
-  docs", "update dependencies", "update the board") are normal project edits and
-  must not enter this pipeline. If intent is ambiguous, ask before starting — this
-  path can mutate installed skill files. See [updating.md](references/updating.md).
 - Prefer temporary task branches/worktrees when the project adapter defines
   them; fetch and reconcile against the remote before basing task work — base on
   the remote canonical branch when local is behind, and surface divergence

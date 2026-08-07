@@ -6,20 +6,26 @@ An Agent Skill that composes product behavior, conducts full-stack delivery
 across one repo, a monorepo, or multiple repositories, and verifies every gate
 with live evidence.
 
-The skill runs a project scan, bootstraps a small project adapter in a dedicated
-orchestration repo, keeps `AGENTS.md` as a lazy root navigator, records approved
-repo topology and domain language, proposes vertical slices from evidence, and
-turns user-visible features, bug fixes, and cross-context changes into behavior
-contracts before coordinating task boards, QA, debug, deploy, landing, and
-handoff. Over time,
-`groom`/`grm` audits the orchestration repo against per-doc size budgets so the
-docs stay a lean lazy-loading tree instead of a precontext tax.
+It scans user-provided project surfaces, bootstraps a small adapter in a
+dedicated orchestration repo, and turns user-visible changes into reviewed
+behavior contracts before coordinating delivery, verification, landing, and
+handoff.
 
 ## Install
 
 ```bash
 npx skills add OnoNguyen/fullstack-orchestrator
 ```
+
+## Commands
+
+Say these to the agent; they are prompts, not shell commands.
+
+| Command | Result |
+| --- | --- |
+| `tasks` / `tsk` | Produce a verified, actionable task board. |
+| `groom` / `grm` | Audit orchestration docs and propose cleanup before editing. |
+| `update` / `upd` | As a standalone request, update the orchestrator skill, reconcile adapter scaffolding, then groom. |
 
 ## What It Creates
 

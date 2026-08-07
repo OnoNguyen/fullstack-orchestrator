@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+README_PATH = REPO_ROOT / "README.md"
 SKILL_PATH = REPO_ROOT / "fullstack-orchestrator" / "SKILL.md"
 AGENTS_TEMPLATE_PATH = (
     REPO_ROOT
@@ -26,6 +27,44 @@ LANDING_PATH = (
 
 
 class SkillContractTests(unittest.TestCase):
+    def test_core_command_tables_are_early_and_scoped(self) -> None:
+        readme = README_PATH.read_text()
+        skill = SKILL_PATH.read_text()
+
+        self.assertLess(readme.index("## Install"), readme.index("## Commands"))
+        self.assertLess(readme.index("## Commands"), readme.index("## What It Creates"))
+        self.assertLess(skill.index("## Operating Rule"), skill.index("## Commands"))
+        self.assertLess(skill.index("## Commands"), skill.index("## First Moves"))
+
+        for document in (readme, skill):
+            commands = re.search(
+                r"(?ms)^## Commands\s*$\n(?P<body>.*?)(?=^## |\Z)", document
+            )
+            self.assertIsNotNone(commands, "document must define a Commands section")
+            body = commands.group("body")
+
+            for command in ("tasks", "tsk", "groom", "grm", "update", "upd"):
+                self.assertIn(f"`{command}`", body)
+            for project_command in ("install", "ins", "deploy", "dpl"):
+                self.assertNotIn(f"`{project_command}`", body)
+
+            self.assertRegex(body.lower(), r"say|prompt")
+
+    def test_update_command_requires_explicit_orchestrator_intent(self) -> None:
+        for document in (README_PATH.read_text(), SKILL_PATH.read_text()):
+            commands = re.search(
+                r"(?ms)^## Commands\s*$\n(?P<body>.*?)(?=^## |\Z)", document
+            )
+            self.assertIsNotNone(commands, "document must define a Commands section")
+            body = commands.group("body").lower()
+
+            self.assertRegex(body, r"standalone|unambiguous")
+            self.assertIn("orchestrator skill", body)
+
+        skill = SKILL_PATH.read_text()
+        self.assertIn("`install` / `ins`", skill)
+        self.assertIn("`deploy`, `dpl`", skill)
+
     def test_core_role_is_compose_conduct_verify(self) -> None:
         skill = SKILL_PATH.read_text()
         core_role = re.search(
