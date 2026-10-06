@@ -11,6 +11,13 @@ Treat project maps, generated docs, and prior summaries as routing hints until
 verified against live filesystem, git, test, CI, and deploy state. Read only the
 smallest project docs needed for the current trigger.
 
+## User summary
+
+Always finish with a short bullet summary answering the applicable questions:
+What did you do? What does that mean for me? How did you check it? Is anything
+left for me to do? Keep the summary in everyday language and within 300 words.
+Omit questions that do not apply.
+
 ## Commands
 
 These are user prompts, not shell commands.
