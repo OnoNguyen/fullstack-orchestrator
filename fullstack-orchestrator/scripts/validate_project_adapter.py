@@ -20,7 +20,6 @@ REQUIRED_FILES = {
     "GLOSSARY.md": [],
     "SLICES.md": [],
     "DOCUMENTATION_POLICY.md": [],
-    "STATUS.md": [],
 }
 
 OPTIONAL_FILES = {
@@ -32,7 +31,6 @@ FORBIDDEN_MARKERS = ["reviewed: false", "unreviewed finding", "unreviewed:"]
 # Soft per-doc line budgets; DOCUMENTATION_POLICY.md Size Budgets rows override.
 DEFAULT_BUDGETS = {
     "AGENTS.md": 60,
-    "STATUS.md": 40,
     "DOCUMENTATION_POLICY.md": 60,
     "ORCHESTRATION.md": 80,
     "TASKS.md": 80,

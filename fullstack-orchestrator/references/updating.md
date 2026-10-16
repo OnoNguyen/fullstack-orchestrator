@@ -81,6 +81,13 @@ Run in order; gate each on user approval; skip any phase the user declines.
 4. Read templates from disk (freshly synced in Phase 1), not from in-session
    skill behavior.
 
+`STATUS.md` is retired. For existing adapters, propose removing its routes,
+writing rules, and file. Before approved removal, commit the exact file or
+preserve and verify its exact bytes in a new archive, including uncommitted
+edits. Retain unique durable decisions and shared human gates in their canonical
+homes; create a ticket if a needed fact has no home. Do not regenerate or
+synchronize the retired file.
+
 ### Phase 3 — Groom
 
 Run the `groom` procedure as a final lean-up so the reconciled docs stay within

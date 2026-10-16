@@ -73,9 +73,12 @@ Core docs every project gets:
   contracts, gates, and merge order.
 - `DOCUMENTATION_POLICY.md`: canonical doc ownership, anti-duplication rules,
   doc size budgets, and grooming policy.
-- `STATUS.md`: coordinator-owned current state, not worker scratchpad.
 - `SKILL_FEEDBACK.md` (optional): evidence-backed missing-skill, stale-skill,
   and reusable-pattern candidates that may become reviewed skill PRs.
+
+Task progress, blockers, and next steps live in the relevant sessions. Build
+task boards on demand and verify claims against live git, PR, CI, and deploy
+evidence. Follow `TASKS.md` for board sources and action boundaries.
 
 Runbooks are emergent, not predefined: one pattern-named doc per stack
 pattern the project actually shows (`QA.md`, `DEBUG.md`, `DEPLOY.md`,

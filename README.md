@@ -40,12 +40,14 @@ a dedicated orchestration repo. Implementation repos stay as surfaces only:
 - `SLICES.md`: vertical slices, stable behavior contracts, gates, and merge
   order
 - `DOCUMENTATION_POLICY.md`: doc ownership, size budgets, grooming policy
-- `STATUS.md`: current state
 - `SKILL_FEEDBACK.md`: reviewed skill-improvement candidates (skills never
   self-mutate)
 - Pattern runbooks (`QA.md`, `DEBUG.md`, `DEPLOY.md`, `JOBS.md`, or new
   pattern names): proposed from scan evidence, written only for patterns the
   stack actually shows, each routed from `AGENTS.md`
+
+Task progress stays in sessions. `tasks` builds a board on demand from relevant
+sessions and checks their claims against live repository, CI, and deploy evidence.
 
 ## Project Scan First
 
