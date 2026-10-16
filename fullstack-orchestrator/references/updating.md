@@ -81,6 +81,12 @@ Run in order; gate each on user approval; skip any phase the user declines.
 4. Read templates from disk (freshly synced in Phase 1), not from in-session
    skill behavior.
 
+The current `STATUS.md` table is a content migration, not a template overwrite.
+Report legacy-format validation failures and request or use existing scoped
+status-refresh authorization. Follow the archive, disposition inventory, and
+source checks in [status-reconciliation.md](status-reconciliation.md) before
+replacing it. An ordinary `update` alone does not authorize this conversion.
+
 ### Phase 3 — Groom
 
 Run the `groom` procedure as a final lean-up so the reconciled docs stay within
@@ -91,5 +97,7 @@ budget and the router stays light. See [grooming.md](grooming.md).
 - `update` mutates installed skill files only on the explicit `update`/`upd`
   command, only from reviewed `origin/main`, and only after per-root approval.
 - Reconciliation and groom touch only the orchestration repo, never implementation
-  repos, and never approved project content.
+  repos. Scaffolding reconciliation preserves approved project content; a
+  separately authorized status refresh may reconcile recorded current state
+  through the lossless conversion procedure above.
 - No writes before the user approves the specific phase or rows.

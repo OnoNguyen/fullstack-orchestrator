@@ -8,7 +8,8 @@
 - Slice mapping, behavior contracts, and gates live in `SLICES.md`.
 - Runbooks live in their pattern-named docs, one canonical runbook per
   pattern, each routed from `AGENTS.md`.
-- Current state lives in `STATUS.md`.
+- Unresolved coordination state lives in `STATUS.md`; link canonical release,
+  slice, ticket, and deployment evidence instead of copying their contents.
 - Evidence-backed skill-improvement candidates live in `SKILL_FEEDBACK.md`.
 - Implementation specs, schemas, migrations, and code-level details live in the
   relevant implementation repo.
@@ -17,13 +18,16 @@
 
 - Do not duplicate canonical glossary terms in repo-local context files.
 - Do not turn `TASKS.md` into an issue tracker or status log.
-- Do not turn `STATUS.md` into a history log or scratchpad.
+- Coordinators replace status rows by stable ID and remove resolved rows after
+  retaining evidence. Workers return evidence without editing the snapshot.
+- Reconcile affected rows after landing, deployment, abandonment, a durable
+  blocker change, or handoff. Task-board generation remains read-only.
 - Do not store credentials in orchestration docs.
 
 ## Size Budgets
 
-Soft line budgets keep the routing tree cheap to load. The adapter validator
-warns when a doc exceeds its budget; edit this table to tune budgets.
+The validator always rejects `STATUS.md` above 40 lines or 600 words, regardless
+of this table or `--strict`. Other line budgets are soft and configurable.
 
 | Doc | Budget |
 | --- | --- |

@@ -49,6 +49,8 @@ Before mutating an implementation repo:
   documented gates.
 - Use `SLICES.md` for slice-specific merge order when it differs from this
   default.
+- Before reporting landing complete, the coordinator reconciles affected
+  `STATUS.md` rows against landing evidence and runs the adapter validator.
 
 ## Cleanup
 

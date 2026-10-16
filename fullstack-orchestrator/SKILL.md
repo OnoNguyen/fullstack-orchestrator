@@ -73,7 +73,8 @@ Core docs every project gets:
   contracts, gates, and merge order.
 - `DOCUMENTATION_POLICY.md`: canonical doc ownership, anti-duplication rules,
   doc size budgets, and grooming policy.
-- `STATUS.md`: coordinator-owned current state, not worker scratchpad.
+- `STATUS.md`: coordinator-owned unresolved items keyed by stable ID, with
+  evidence, owner, check date, and next action. Hard limit: 40 lines and 600 words.
 - `SKILL_FEEDBACK.md` (optional): evidence-backed missing-skill, stale-skill,
   and reusable-pattern candidates that may become reviewed skill PRs.
 
@@ -173,6 +174,10 @@ Use scripts as evidence collectors and validators, not as authority:
 - After successful landing, close the `SLICES.md` ledger: set `Status: Landed`,
   record `Landed at` repo commits and durable `Evidence` for every `BC-*`, then
   rerun targeted strict validation before reporting completion.
+- Before finishing a landing, deployment, abandonment, durable blocker change,
+  handoff, or explicit status refresh, the coordinator reconciles affected
+  `STATUS.md` rows using [status-reconciliation.md](references/status-reconciliation.md).
+  Task-board generation stays read-only. Workers return evidence to the coordinator.
 - Use [worktrees-and-landing.md](references/worktrees-and-landing.md) when a
   task may dirty multiple repos, needs runtime QA, or involves landing/cleanup.
 - Do not deploy unless the user explicitly says `deploy`, `dpl`, or the

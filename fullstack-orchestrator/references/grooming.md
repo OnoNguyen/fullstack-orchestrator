@@ -53,7 +53,7 @@ the adapter a lazy-loading tree of small, single-owner docs.
 | Doc | Common rot | Groom move |
 | --- | --- | --- |
 | `AGENTS.md` | runbook steps or policy prose creep into the router | demote to the owning leaf doc; keep rows one line |
-| `STATUS.md` | history log accretes | trim to current state; archive the rest |
+| `STATUS.md` | history log accretes | preserve original bytes, account for unresolved topics, and convert under [status-reconciliation.md](status-reconciliation.md); never truncate to fit |
 | `TASKS.md` | becomes a backlog of stored tasks | keep command policy only; tasks live in live state |
 | `SLICES.md` | landed slices keep full setup detail | compact each landed slice while preserving its stable behavior-contract IDs, observable outcomes, gate evidence, and landing commits |
 | `GLOSSARY.md` | implementation detail creeps in | move detail to the implementation repo |

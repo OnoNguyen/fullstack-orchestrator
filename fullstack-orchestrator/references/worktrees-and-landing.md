@@ -74,9 +74,13 @@ Default landing policy is all-or-hold for cross-repo changes:
    `Landed at` as `repo@commit`, and replace pending values with durable
    `Evidence` for every `BC-*` gate. Do not mark partially landed work as
    `Landed`.
-6. Run `validate_project_adapter.py <orchestration-root> --strict --slice
+6. In the coordinator's serial landing phase, reconcile affected `STATUS.md`
+   rows against the landed commits under
+   [status-reconciliation.md](status-reconciliation.md). Worker worktrees return
+   evidence; they do not each write a copy of the shared snapshot.
+7. Run `validate_project_adapter.py <orchestration-root> --strict --slice
    "<slice name>"` and land the ledger update only when it passes.
-7. Remove merged task worktrees and stale task branches only after successful
+8. Remove merged task worktrees and stale task branches only after successful
    landing, unless the user asks to preserve them.
 
 Never discard unrelated work or delete an unmerged worktree without explicit

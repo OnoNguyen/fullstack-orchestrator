@@ -40,7 +40,8 @@ a dedicated orchestration repo. Implementation repos stay as surfaces only:
 - `SLICES.md`: vertical slices, stable behavior contracts, gates, and merge
   order
 - `DOCUMENTATION_POLICY.md`: doc ownership, size budgets, grooming policy
-- `STATUS.md`: current state
+- `STATUS.md`: unresolved coordination rows with stable IDs, owners, check dates,
+  evidence links, and next actions; hard limit of 40 lines and 600 words
 - `SKILL_FEEDBACK.md`: reviewed skill-improvement candidates (skills never
   self-mutate)
 - Pattern runbooks (`QA.md`, `DEBUG.md`, `DEPLOY.md`, `JOBS.md`, or new

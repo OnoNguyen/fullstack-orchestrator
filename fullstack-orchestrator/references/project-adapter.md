@@ -44,7 +44,7 @@ Recommended trigger rows:
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
 | feature implementation, behavior change, bug fix, cross-context or external contract | `GLOSSARY.md`, `SLICES.md` |
 | slice planning, behavior contracts, BDD, gates, dependencies, merge order | `SLICES.md` |
-| current pending state, blockers, landing, deploy state | `STATUS.md` |
+| current pending state, blockers, landing, deploy state, status refresh | `STATUS.md`, `DOCUMENTATION_POLICY.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
 | groom, grm, doc bloat, size budgets | `DOCUMENTATION_POLICY.md` |
 | missing skills, stale skills, reusable workflow patterns, skill PRs | `SKILL_FEEDBACK.md` |
@@ -83,6 +83,8 @@ Record the approved `tasks`/`tsk` command behavior:
 - task-board sources such as `STATUS.md`, `SLICES.md`, `WORKTREES.md`, threads,
   worktrees, and branch state
 - actionable-only inclusion rules
+- contradicted status rows become evidence-linked coordinator reconciliation
+  candidates; their stale next actions never become ready work
 - row status labels, including `Needs behavior contract`
 - board columns
 - ranking policy
@@ -138,8 +140,18 @@ an unrelated approved or landed slice.
 
 ## STATUS.md
 
-Keep current state small. It is not a history log or worker scratchpad. Use it
-for pending work, blockers, deploy state, verification state, and next action.
+Use the fixed current-state table in `assets/project-adapter/STATUS.md.template`.
+Rows represent unresolved coordination topics with stable IDs, state, owner,
+check date, current condition, evidence link, and next action. An empty table
+records no items; it does not prove the project has no outstanding work.
+
+The validator rejects malformed rows, duplicate IDs, extra prose or headings,
+and files above 40 lines or 600 words even without `--strict`. Project budgets
+cannot raise these limits. Evidence links and dates are structural checks;
+they do not establish that the source is current or proves the claim.
+
+Follow [status-reconciliation.md](status-reconciliation.md) for coordinator
+updates, validation, and lossless conversion of an existing status file.
 
 ## Runbooks
 
@@ -207,8 +219,9 @@ Use `DOCUMENTATION_POLICY.md` to prevent duplicated truth:
 
 It also owns the grooming policy for the `groom`/`grm` trigger:
 
-- a Size Budgets table with soft per-doc line budgets, enforced as validator
-  warnings (errors with `--strict`); missing approved or landed behavior
+- a Size Budgets table with soft per-doc line budgets, except the hard
+  `STATUS.md` limits; other budgets warn and become errors with `--strict`;
+  missing approved or landed behavior
   contracts also warn and become errors with `--strict`
 - report-first grooming: propose findings in chat, apply only approved moves
 - archive over delete: stale content moves to `archive/` under date-stamped

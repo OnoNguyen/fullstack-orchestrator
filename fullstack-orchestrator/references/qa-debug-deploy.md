@@ -108,8 +108,10 @@ Deploy flow:
 6. push only payload repos
 7. deploy only payload repos
 8. verify live state
-9. update `STATUS.md` with final success, final blocker, or exhausted retry
-   budget
+9. retain the final success or blocker receipt in its canonical evidence source;
+   reconcile affected `STATUS.md` rows under
+   [status-reconciliation.md](status-reconciliation.md); preserve unrelated rows
+   and each dependent's unfinished work or human checks, then validate the adapter
 
 ## Retry Budget
 
@@ -134,3 +136,8 @@ Recommend a handoff when work crosses a context or ownership boundary, such as:
 - another agent, thread, or human taking over
 - long context where decisions and next commands may get buried
 - review, QA, or deploy owner taking over from implementation owner
+
+Before handing off, reconcile affected status rows with an owner, checked date,
+evidence, and next action under
+[status-reconciliation.md](status-reconciliation.md). Keep unverified human
+checks as `needs-verification` until the missing evidence arrives.

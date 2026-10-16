@@ -99,7 +99,14 @@ The person using the product.
 
 Keep canonical documents concise.
 """,
-                "STATUS.md": "# Status\n",
+                "STATUS.md": """\
+# Test Orchestration Status
+
+## Current
+
+| ID | State | Owner | Checked | Condition | Evidence | Next action |
+| --- | --- | --- | --- | --- | --- | --- |
+""",
             }
             for name, content in documents.items():
                 (root / name).write_text(content)

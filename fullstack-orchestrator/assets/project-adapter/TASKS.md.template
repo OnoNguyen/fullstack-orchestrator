@@ -16,6 +16,7 @@ Check the smallest live source set needed:
   order
 - `WORKTREES.md` for task branch/worktree policy
 - `ORCHESTRATION.md` for repo aliases and local paths
+- canonical tickets and evidence linked from current coordination rows
 - active threads, task worktrees, branches, and dirty state when available
 
 If thread tools are available, inspect relevant project threads before ranking.
@@ -29,6 +30,9 @@ docs.
   abandoned.
 - Omit completed history unless live residue still needs a decision.
 - Verify actual repo, branch/worktree, and git state before ranking a row.
+- If a status row contradicts checked evidence, show `Reconcile <ID>` as
+  `Blocked`, link the evidence in `Why prioritized`, and route its next check
+  to the coordinator. Do not rank the stale next action as ready work.
 - Treat cleanup and abort candidates as recommendation-only.
 - Do not update `STATUS.md`, archive threads, delete worktrees, or delete
   branches while generating the board.

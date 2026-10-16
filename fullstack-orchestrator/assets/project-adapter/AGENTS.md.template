@@ -13,7 +13,7 @@ only the deeper docs triggered by the current task.
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
 | feature implementation, behavior change, bug fix, cross-context or external contract | `GLOSSARY.md`, `SLICES.md` |
 | slice planning, behavior contracts, BDD, gates, dependencies, merge order | `SLICES.md` |
-| current pending state, blockers, landing, deploy state | `STATUS.md` |
+| current pending state, blockers, landing, deploy state, status refresh | `STATUS.md`, `DOCUMENTATION_POLICY.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
 | groom, grm, doc bloat, size budgets | `DOCUMENTATION_POLICY.md` |
 | missing skills, stale skills, reusable workflow patterns, skill PRs | `SKILL_FEEDBACK.md` |
@@ -26,4 +26,5 @@ only the deeper docs triggered by the current task.
 - Read only the smallest triggered doc set needed for the task.
 - Treat generated docs as routing hints until verified against live git,
   filesystem, test, CI, and deploy state.
-- Do not update `STATUS.md` unless acting as coordinator for current state.
+- Only the acting coordinator reconciles `STATUS.md`. Replace affected rows by
+  stable ID, verify their evidence, and run the adapter validator before completion.

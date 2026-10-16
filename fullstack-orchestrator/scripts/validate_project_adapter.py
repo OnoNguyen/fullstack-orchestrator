@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from datetime import date, timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 # Core coordination docs every project needs. Runbooks (QA.md, DEPLOY.md, ...)
@@ -84,6 +86,20 @@ DURABLE_EVIDENCE_LOCATOR = re.compile(
 )
 
 
+STATUS_COLUMNS = ("ID", "State", "Owner", "Checked", "Condition", "Evidence", "Next action")
+STATUS_ID = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
+STATUS_STATES = {"pending", "blocked", "needs-verification"}
+STATUS_LINK = re.compile(r"(?<!!)\[([^\[\]\n]+)\]\(([^\s()]+)\)")
+STATUS_WORD_LIMITS = {"Owner": 6, "Condition": 25, "Evidence": 15, "Next action": 25}
+STATUS_SHAPE_ERROR = (
+    "STATUS.md must use the snapshot shape. Expected '# <project> Orchestration Status', "
+    "'## Current', and the contiguous seven-column current-items table. "
+    "If migrating legacy content, archive its exact bytes and follow "
+    "references/status-reconciliation.md in the skill directory before replacing the file; "
+    "do not truncate unresolved work."
+)
+
+
 def read(path: Path) -> str:
     try:
         return path.read_text()
@@ -106,6 +122,150 @@ def is_missing_value(value: str) -> bool:
 def is_durable_evidence(value: str) -> bool:
     match = EVIDENCE_VALUE.fullmatch(value.strip())
     return bool(match and DURABLE_EVIDENCE_LOCATOR.search(match.group("locator")))
+
+
+def status_cells(line: str) -> list[str]:
+    if not line.startswith("|") or not line.endswith("|"):
+        return []
+    cells: list[str] = []
+    start = 1
+    backslashes = 0
+    for index, character in enumerate(line[1:], 1):
+        if character == "|" and backslashes % 2 == 0:
+            cells.append(line[start:index].strip())
+            start = index + 1
+        backslashes = backslashes + 1 if character == "\\" else 0
+    return cells if start == len(line) else []
+
+
+def has_status_evidence(value: str) -> bool:
+    links = list(STATUS_LINK.finditer(value))
+    if not links:
+        return False
+    end = 0
+    for match in links:
+        if not re.fullmatch(r"[\s,;]*", value[end : match.start()]):
+            return False
+        label, target = match.groups()
+        if is_missing_value(label) or is_missing_value(target):
+            return False
+        try:
+            link = urlsplit(target)
+        except ValueError:
+            return False
+        if not (link.scheme == "https" and link.hostname) and not (
+            not link.scheme
+            and not link.netloc
+            and link.path
+            and not link.path.startswith("/")
+            and link.path not in {".", ".."}
+        ):
+            return False
+        end = match.end()
+    return bool(re.fullmatch(r"[\s,;]*", value[end:]))
+
+
+def validate_status(content: str) -> list[str]:
+    """Validate snapshot structure, not the truth or freshness of its claims."""
+    errors: list[str] = []
+    physical_lines = content.splitlines()
+    if len(physical_lines) > 40:
+        errors.append(
+            f"STATUS.md has {len(physical_lines)} lines; hard limit is 40. "
+            "Reconcile current rows, remove proven resolved rows, and move detail "
+            "to its canonical source."
+        )
+    words = len(content.split())
+    if words > 600:
+        errors.append(
+            f"STATUS.md has {words} words; hard limit is 600. "
+            "Whitespace-separated words include Markdown table tokens. "
+            "Reconcile current rows and link detailed evidence from its canonical source."
+        )
+
+    lines = [
+        (number, line.rstrip())
+        for number, line in enumerate(physical_lines, 1)
+        if line.strip()
+    ]
+    if len(lines) < 4:
+        return errors + [STATUS_SHAPE_ERROR]
+    title = re.fullmatch(r"# (.+) Orchestration Status", lines[0][1])
+    separator = status_cells(lines[3][1])
+    if (
+        not title
+        or is_missing_value(title.group(1))
+        or "{project_name}" in title.group(1)
+        or lines[1][1] != "## Current"
+        or status_cells(lines[2][1]) != list(STATUS_COLUMNS)
+        or lines[3][0] != lines[2][0] + 1
+        or len(separator) != 7
+        or not all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator)
+    ):
+        return errors + [STATUS_SHAPE_ERROR]
+
+    seen_ids: set[str] = set()
+    previous_line = lines[3][0]
+    for line_number, line in lines[4:]:
+        if line_number != previous_line + 1:
+            errors.append(
+                f"STATUS.md line {line_number} must be contiguous with the current-items "
+                "table; remove blank lines between the separator and rows or between rows"
+            )
+        previous_line = line_number
+        cells = status_cells(line)
+        if len(cells) != 7:
+            errors.append(
+                f"STATUS.md line {line_number} must be a table row with exactly seven cells; "
+                "move history or prose to its canonical source and escape cell pipes as \\| or encode them as &#124; or %7C."
+            )
+            continue
+        item = dict(zip(STATUS_COLUMNS, cells))
+        topic_id = item["ID"]
+        location = f"STATUS.md line {line_number}"
+        if not STATUS_ID.fullmatch(topic_id) or len(topic_id) > 64:
+            errors.append(
+                f"{location} has invalid ID; use a lowercase hyphenated topic slug "
+                "of at most 64 characters"
+            )
+        if topic_id in seen_ids:
+            errors.append(f"{location} has duplicate ID: {topic_id}")
+        seen_ids.add(topic_id)
+        if item["State"] not in STATUS_STATES:
+            errors.append(
+                f"{location} has invalid State; use pending, blocked, or "
+                "needs-verification and remove resolved rows"
+            )
+        for field in ("Owner", "Checked", "Condition", "Evidence", "Next action"):
+            if is_missing_value(item[field]):
+                errors.append(f"{location} requires a meaningful {field} value")
+        for field, limit in STATUS_WORD_LIMITS.items():
+            if len(item[field].split()) > limit:
+                errors.append(
+                    f"{location} {field} exceeds {limit} words; link detailed context "
+                    "from its canonical source"
+                )
+        checked = item["Checked"]
+        try:
+            checked_date = date.fromisoformat(checked)
+        except ValueError:
+            checked_date = None
+        # A coordinator's local date can be one day ahead of the CI runner.
+        if (
+            not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", checked)
+            or checked_date is None
+            or checked_date > date.today() + timedelta(days=1)
+        ):
+            errors.append(
+                f"{location} Checked must be a real YYYY-MM-DD date at most one day ahead"
+            )
+        if not has_status_evidence(item["Evidence"]):
+            errors.append(
+                f"{location} Evidence must contain only inline Markdown links "
+                "with meaningful labels and relative source paths or HTTPS sources, "
+                "separated by whitespace, commas, or semicolons"
+            )
+    return errors
 
 
 def strip_nonrendered_blocks(content: str) -> str:
@@ -410,6 +570,10 @@ def validate(
         errors.extend(behavior_errors)
         warnings.extend(behavior_warnings)
 
+    status = root / "STATUS.md"
+    if status.exists():
+        errors.extend(validate_status(read(status)))
+
     policy = root / "DOCUMENTATION_POLICY.md"
     if policy.exists() and "Grooming" not in read(policy):
         warnings.append(
@@ -454,7 +618,7 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
-    print("\nAdapter is valid.")
+    print("\nAdapter structure is valid.")
     return 0
 
 
