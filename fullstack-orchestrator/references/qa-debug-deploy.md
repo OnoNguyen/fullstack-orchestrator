@@ -108,8 +108,9 @@ Deploy flow:
 6. push only payload repos
 7. deploy only payload repos
 8. verify live state
-9. update `STATUS.md` with final success, final blocker, or exhausted retry
-   budget
+9. report the observed outcome and evidence in the task session; record remaining
+   human checks or external blockers in a shared ticket or committed slice or
+   release record
 
 ## Retry Budget
 
@@ -134,3 +135,7 @@ Recommend a handoff when work crosses a context or ownership boundary, such as:
 - another agent, thread, or human taking over
 - long context where decisions and next commands may get buried
 - review, QA, or deploy owner taking over from implementation owner
+
+Leave the outcome, evidence, remaining work, and next step in the task session.
+Before handing work to someone outside that session, record any unresolved item
+they must act on in a shared ticket or committed slice or release record.

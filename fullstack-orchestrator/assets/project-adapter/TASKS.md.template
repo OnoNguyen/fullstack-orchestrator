@@ -11,16 +11,19 @@ orientation surface, not a second issue tracker.
 
 Check the smallest live source set needed:
 
-- `STATUS.md` for current pending work and blockers
+- relevant task sessions for progress, blockers, and next steps
+- relevant open tickets and release records for shared gates and external blockers
 - `SLICES.md` for approved slice names, behavior contracts, gates, and landing
   order
 - `WORKTREES.md` for task branch/worktree policy
 - `ORCHESTRATION.md` for repo aliases and local paths
-- active threads, task worktrees, branches, and dirty state when available
+- task worktrees, branches, dirty state, PRs, CI, and deployment evidence
 
-If thread tools are available, inspect relevant project threads before ranking.
-If they are not available, rely on local worktrees, git state, and orchestration
-docs.
+Read the latest relevant session turns before ranking. Use session summaries to
+find the work. Check each session's state and next step against live evidence;
+omit actions already completed. A session's running or idle flag does not
+establish task completion. If a session is unavailable, mark its progress
+unknown and use the evidence you can inspect.
 
 ## Board Rules
 
@@ -30,8 +33,8 @@ docs.
 - Omit completed history unless live residue still needs a decision.
 - Verify actual repo, branch/worktree, and git state before ranking a row.
 - Treat cleanup and abort candidates as recommendation-only.
-- Do not update `STATUS.md`, archive threads, delete worktrees, or delete
-  branches while generating the board.
+- Generate the board in chat without changing project files, archiving threads,
+  or deleting worktrees or branches.
 
 ## Status Labels
 

@@ -43,7 +43,6 @@ class BehaviorContractValidatorTests(unittest.TestCase):
 | terms | `GLOSSARY.md` |
 | behavior | `SLICES.md` |
 | documentation | `DOCUMENTATION_POLICY.md` |
-| status | `STATUS.md` |
 
 ## Default Discipline
 
@@ -99,7 +98,6 @@ The person using the product.
 
 Keep canonical documents concise.
 """,
-                "STATUS.md": "# Status\n",
             }
             for name, content in documents.items():
                 (root / name).write_text(content)

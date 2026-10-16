@@ -24,7 +24,7 @@ the adapter a lazy-loading tree of small, single-owner docs.
   canonical copy per `DOCUMENTATION_POLICY.md` ownership; replace the rest
   with a one-line pointer.
 - Archive over delete: move stale content to `archive/` in the orchestration
-  repo under date-stamped names such as `archive/STATUS-2026-07.md`. Deletion
+  repo under date-stamped names such as `archive/incident-2026-07.md`. Deletion
   needs explicit approval. Never route `archive/` from `AGENTS.md`.
 - Verify before pruning: a repo, branch, worktree, or slice reference is stale
   only after checking live state, per the Operating Rule.
@@ -53,7 +53,6 @@ the adapter a lazy-loading tree of small, single-owner docs.
 | Doc | Common rot | Groom move |
 | --- | --- | --- |
 | `AGENTS.md` | runbook steps or policy prose creep into the router | demote to the owning leaf doc; keep rows one line |
-| `STATUS.md` | history log accretes | trim to current state; archive the rest |
 | `TASKS.md` | becomes a backlog of stored tasks | keep command policy only; tasks live in live state |
 | `SLICES.md` | landed slices keep full setup detail | compact each landed slice while preserving its stable behavior-contract IDs, observable outcomes, gate evidence, and landing commits |
 | `GLOSSARY.md` | implementation detail creeps in | move detail to the implementation repo |

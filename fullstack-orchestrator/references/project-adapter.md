@@ -10,7 +10,7 @@ Implementation repos are surfaces only by default.
 
 The adapter has two tiers. Core coordination docs exist in every project:
 `AGENTS.md`, `ORCHESTRATION.md`, `TASKS.md`, `WORKTREES.md`, `GLOSSARY.md`,
-`SLICES.md`, `DOCUMENTATION_POLICY.md`, `STATUS.md` (plus optional
+`SLICES.md`, `DOCUMENTATION_POLICY.md` (plus optional
 `SKILL_FEEDBACK.md`). Runbooks are emergent: one pattern-named doc per stack
 pattern the project actually has, created on approval — never a fixed set of
 stubs.
@@ -39,12 +39,11 @@ Recommended trigger rows:
 | Trigger | Read |
 | --- | --- |
 | repo map, aliases, ownership, multi-repo work | `ORCHESTRATION.md` |
-| tasks, tsk, task board, continue/abort candidates | `TASKS.md` |
+| tasks, tsk, task board, current work, blockers, continue/abort candidates | `TASKS.md` |
 | task branches, worktrees, landing, cleanup | `WORKTREES.md` |
 | domain language, user-facing copy, data boundaries | `GLOSSARY.md` |
 | feature implementation, behavior change, bug fix, cross-context or external contract | `GLOSSARY.md`, `SLICES.md` |
 | slice planning, behavior contracts, BDD, gates, dependencies, merge order | `SLICES.md` |
-| current pending state, blockers, landing, deploy state | `STATUS.md` |
 | documentation placement or canonical ownership | `DOCUMENTATION_POLICY.md` |
 | groom, grm, doc bloat, size budgets | `DOCUMENTATION_POLICY.md` |
 | missing skills, stale skills, reusable workflow patterns, skill PRs | `SKILL_FEEDBACK.md` |
@@ -80,13 +79,18 @@ Record approved mutation and landing policy:
 
 Record the approved `tasks`/`tsk` command behavior:
 
-- task-board sources such as `STATUS.md`, `SLICES.md`, `WORKTREES.md`, threads,
-  worktrees, and branch state
+- relevant task sessions for progress, blockers, and next steps; live git,
+  worktree, PR, CI, and deploy evidence for factual checks
+- relevant open tickets and release records for shared gates and external blockers
+- session state and next steps checked against live evidence before ranking;
+  completed actions omitted
+- session access gaps reported as unknown progress
 - actionable-only inclusion rules
 - row status labels, including `Needs behavior contract`
 - board columns
 - ranking policy
-- action boundary for cleanup, aborts, thread archiving, and status updates
+- read-only board generation and action boundaries for cleanup, aborts, and
+  thread archiving
 
 `TASKS.md` is command policy, not a backlog. Do not store every task there.
 
@@ -135,11 +139,6 @@ as `passed`, `verified`, `observed`, `successful`, or `healthy`.
 Before implementing or landing a known slice, run the adapter validator with
 `--strict --slice "<slice name>"`; global readiness alone can be satisfied by
 an unrelated approved or landed slice.
-
-## STATUS.md
-
-Keep current state small. It is not a history log or worker scratchpad. Use it
-for pending work, blockers, deploy state, verification state, and next action.
 
 ## Runbooks
 
