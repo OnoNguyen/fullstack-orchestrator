@@ -17,6 +17,23 @@ handoff.
 npx skills add OnoNguyen/fullstack-orchestrator
 ```
 
+## Run It Against Your Repo
+
+In your agent, invoke the skill with the path to one repo of your stack:
+
+```text
+/fullstack-orchestrator /path/to/my-app
+```
+
+The agent scans the stack and shows its findings in chat. Once you approve
+them, it creates a `<my-stack>-orchestration` folder next to your repos holding
+the stack's vertical slices with their behavior contracts, plus the
+fundamentals to fly on: repo map, glossary, worktree policy, and runbooks. Your
+implementation repos stay untouched.
+
+Run future sessions from the `<my-stack>-orchestration` folder, or invoke
+`/fullstack-orchestrator` again from anywhere.
+
 ## Commands
 
 Say these to the agent; they are prompts, not shell commands.
